@@ -2,21 +2,21 @@
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-# from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from langchain_community.chat_models import ChatOpenAI
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 
 import gradio as gr
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
 from langchain_community.embeddings import SentenceTransformerEmbeddings
-# from langchain.vectorstores import Chroma
-from langchain_community.vectorstores import Chroma
-# from langchain.document_loaders import PyPDFDirectoryLoader
-from langchain_community.document_loaders import PyPDFDirectoryLoader
+from langchain.vectorstores import Chroma
+# from langchain_community.vectorstores import Chroma
+from langchain.document_loaders import PyPDFDirectoryLoader
+# from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 
@@ -74,11 +74,12 @@ def gpt_llm(query):
     retrieved_docs = vector_database.similarity_search(query, k=7)  # 가장 관련성 높은 문서 검색
 
     context = ""
+    print(retrieved_docs)
     if retrieved_docs:
         context = "\n\n".join([doc.page_content for doc in retrieved_docs])
 
     input_data = {"context": context, "query": query}
-    result = qa_chain(input_data)
+    result = qa_chain({"question": query, "context": context})
 
     return result["result"]
 
