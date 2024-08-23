@@ -747,6 +747,7 @@ embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 vector_database = Chroma.from_documents(documents = chunks, embedding = embeddings)
 
 
+# question  ="네이버에서 사과를 검색해줘"
 
 # llm모델 가져오기
 llm = ChatOpenAI(api_key=api_key, model_name="gpt-4o", temperature=0)
@@ -758,15 +759,9 @@ chain = load_qa_chain(llm, chain_type="stuff",verbose=True)
 # rag chain에 넣을 prompt구성
 QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt)
 
-
-# question  ="네이버에서 사과를 검색해줘"
-
-import gradio as gr
-from bs4 import BeautifulSoup as bs
-import pprint
-from halo import Halo
-
 xmlresult = ""
+
+
 def gpt_llm(query):
   # Retrieval QA
   qa_chain = RetrievalQA.from_chain_type(
@@ -775,15 +770,16 @@ def gpt_llm(query):
       chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
   )
 
-  retrieved_docs = vector_database.similarity_search(query, k=7)  # 가장 관련성 높은 문서 1개 검색
+  # 가장 관련성 높은 문서 1개 검색
+  retrieved_docs = vector_database.similarity_search(query, k=7)  
 
   # 검색된 문서들에서 context 결합하기
+  # 7개의 문서 내용을 결합
   if retrieved_docs:
-      context = "\n\n".join([doc.page_content for doc in retrieved_docs])  # 3개의 문서 내용을 결합
+      context = "\n\n".join([doc.page_content for doc in retrieved_docs])  
       # print("Retrieved Context:", context)
   else:
       print("No relevant context found.")
-
 
   # 입력값을 "context"와 "x"로 묶어서 전달
   input_data = {
@@ -983,38 +979,3 @@ json_data["Xaml"] = converted_xml_data
 # 5. 변경된 데이터를 다시 JSON 파일로 저장
 save_json(file_path, json_data)
 
-
-# # LLM결과 주입
-# final_output = xaml_template.format(custom_code=converted_xml_data, question=question, created_time=get_current_time())
-# # JSON 문자열로 변환
-# print(final_output)
-
-# # print(json_str)
-# final_output_json = json.loads(final_output)
-# # print(final_output_json)
-# # JSON 형식으로 변환
-# try:
-#     final_output_json = json.loads(final_output)
-# except json.JSONDecodeError as e:
-#     print(f"JSON 변환 오류: {e}")
-# else:
-#     print("JSON 객체로 변환되었습니다:")
-#     print(final_output_json)
-
-# # 저장할 디렉토리 경로 (Colab의 기본 파일 시스템 경로)
-# output_directory = "/content/blueAI_createdJson"
-
-# # 디렉토리 생성 (이미 존재하면 ut오류를 무시)
-# os.makedirs(output_directory, exist_ok=True)
-
-# # 파일명 생성
-# filename = f"{question}.json"
-
-# # 파일 경로 생성
-# file_path = os.path.join(output_directory, filename)
-
-# # JSON 데이터를 파일에 저장
-# with open(file_path, 'w', encoding='utf-8') as json_file:
-#     json.dump(final_output_json, json_file, ensure_ascii=False, indent=2)
-
-# print(f"JSON 파일이 {file_path}에 저장되었습니다.")
