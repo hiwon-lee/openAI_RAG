@@ -1,5 +1,6 @@
 json_template/
 prompt/
 ragData/
+createdJsonEx/
 
 .env
