@@ -1,6 +1,3 @@
-json_template/
-prompt/
-ragData/
-createdJsonEx/
+__pycache__
 
 .env
