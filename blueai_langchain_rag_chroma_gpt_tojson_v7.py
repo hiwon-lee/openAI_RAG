@@ -52,270 +52,296 @@ from langchain.prompts import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
 
 """### json템플릿과 prompt"""
+# xaml_template, json_template, prompt는 각각 다른 파일로 만들어 모듈화하기를 추천드립니다.(죄송합니다. 시간이 없어요ㅠㅠ) - 이희원 왈 
 
-xaml_template = """<Activity mc1:Ignorable="sads sap sap2010" x:Class="New_Workflow" sap2010:WorkflowViewState.IdRef="New_Workflow_1" mva1:VisualBasic.Settings="Assembly references and imported namespaces serialized as XML namespaces"
- xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
- xmlns:b="clr-namespace:beBOT;assembly=beBOT"
- xmlns:b1="clr-namespace:beBOT;assembly=beBOT.Interfaces"
- xmlns:ba="clr-namespace:beBOT.Activities;assembly=beBOT"
- xmlns:bi="clr-namespace:beBOT.Interfaces;assembly=beBOT"
- xmlns:bi1="clr-namespace:beBOT.Input;assembly=beBOT.Interfaces"
- xmlns:bi2="clr-namespace:beBOT.Interfaces;assembly=beBOT.Interfaces"
- xmlns:bia="clr-namespace:beBOT.Interfaces.Activities;assembly=beBOT.Interfaces"
- xmlns:bie="clr-namespace:beBOT.Interfaces.entity;assembly=beBOT.Interfaces"
- xmlns:bii="clr-namespace:beBOT.Interfaces.IPCService;assembly=beBOT.Interfaces"
- xmlns:bii1="clr-namespace:beBOT.Interfaces.Input;assembly=beBOT.Interfaces"
- xmlns:bii2="clr-namespace:beBOT.Interfaces.Image;assembly=beBOT.Interfaces"
- xmlns:bim="clr-namespace:beBOT.Interfaces.mq;assembly=beBOT.Interfaces"
- xmlns:bio="clr-namespace:beBOT.Interfaces.Overlay;assembly=beBOT.Interfaces"
- xmlns:bir="clr-namespace:beBOT.Interfaces.Resources;assembly=beBOT.Interfaces"
- xmlns:bis="clr-namespace:beBOT.Interfaces.Selector;assembly=beBOT.Interfaces"
- xmlns:biv="clr-namespace:beBOT.Interfaces.VT;assembly=beBOT.Interfaces"
- xmlns:biv1="clr-namespace:beBOT.Interfaces.Views;assembly=beBOT.Interfaces"
- xmlns:biw="clr-namespace:beBOT.Interfaces.win32;assembly=beBOT.Interfaces"
- xmlns:bn="clr-namespace:beBOT.NM;assembly=beBOT.NM"
- xmlns:bna="clr-namespace:beBOT.NM.Activities;assembly=beBOT.NM"
- xmlns:bnp="clr-namespace:beBOT.NM.pipe;assembly=beBOT.NM"
- xmlns:bnr="clr-namespace:beBOT.NM.Resources;assembly=beBOT.NM"
- xmlns:bns="clr-namespace:beBOT.NM.Snippets;assembly=beBOT.NM"
- xmlns:bnv="clr-namespace:beBOT.NM.Views;assembly=beBOT.NM"
- xmlns:br="clr-namespace:beBOT.Resources;assembly=beBOT"
- xmlns:bs="clr-namespace:beBOT.Store;assembly=beBOT"
- xmlns:bv="clr-namespace:beBOT.Views;assembly=beBOT"
- xmlns:bv1="clr-namespace:beBOT.ViewModel;assembly=beBOT"
- xmlns:bw="clr-namespace:beBOT.WorkItems;assembly=beBOT"
- xmlns:bw1="clr-namespace:beBOT.Windows;assembly=beBOT.Windows"
- xmlns:c="clr-namespace:ClosedXML;assembly=ClosedXML"
- xmlns:ca="clr-namespace:ClosedXML.Attributes;assembly=ClosedXML"
- xmlns:ce="clr-namespace:ClosedXML.Excel;assembly=ClosedXML"
- xmlns:cec="clr-namespace:ClosedXML.Excel.CalcEngine;assembly=ClosedXML"
- xmlns:cecf="clr-namespace:ClosedXML.Excel.CalcEngine.Functions;assembly=ClosedXML"
- xmlns:ced="clr-namespace:ClosedXML.Excel.Drawings;assembly=ClosedXML"
- xmlns:cee="clr-namespace:ClosedXML.Excel.Exceptions;assembly=ClosedXML"
- xmlns:cg="clr-namespace:ClosedXML.Graphics;assembly=ClosedXML"
- xmlns:cu="clr-namespace:ClosedXML.Utils;assembly=ClosedXML"
- xmlns:mc="clr-namespace:Microsoft.CSharp;assembly=System"
- xmlns:mc1="http://schemas.openxmlformats.org/markup-compatibility/2006"
- xmlns:mss="clr-namespace:Microsoft.SqlServer.Server;assembly=System.Data"
- xmlns:mv="clr-namespace:Microsoft.VisualBasic;assembly=System"
- xmlns:mv1="clr-namespace:Microsoft.VisualBasic;assembly=Microsoft.VisualBasic"
- xmlns:mva="clr-namespace:Microsoft.VisualBasic.ApplicationServices;assembly=Microsoft.VisualBasic"
- xmlns:mva1="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
- xmlns:mvc="clr-namespace:Microsoft.VisualBasic.CompilerServices;assembly=Microsoft.VisualBasic"
- xmlns:mvd="clr-namespace:Microsoft.VisualBasic.Devices;assembly=Microsoft.VisualBasic"
- xmlns:mvf="clr-namespace:Microsoft.VisualBasic.FileIO;assembly=Microsoft.VisualBasic"
- xmlns:mvl="clr-namespace:Microsoft.VisualBasic.Logging;assembly=Microsoft.VisualBasic"
- xmlns:mvm="clr-namespace:Microsoft.VisualBasic.MyServices;assembly=Microsoft.VisualBasic"
- xmlns:mvmi="clr-namespace:Microsoft.VisualBasic.MyServices.Internal;assembly=Microsoft.VisualBasic"
- xmlns:mw="clr-namespace:Microsoft.Win32;assembly=mscorlib"
- xmlns:mw1="clr-namespace:Microsoft.Win32;assembly=System"
- xmlns:mws="clr-namespace:Microsoft.Win32.SafeHandles;assembly=mscorlib"
- xmlns:mws1="clr-namespace:Microsoft.Win32.SafeHandles;assembly=System.Core"
- xmlns:mws2="clr-namespace:Microsoft.Win32.SafeHandles;assembly=System"
- xmlns:p="clr-namespace:XamlGeneratedNamespace;assembly=beBOT"
- xmlns:p1="clr-namespace:XamlGeneratedNamespace;assembly=beBOT.Interfaces"
- xmlns:s="clr-namespace:System;assembly=mscorlib"
- xmlns:s1="clr-namespace:System;assembly=System.Core"
- xmlns:s10="clr-namespace:System;assembly=System.ValueTuple"
- xmlns:s2="clr-namespace:System;assembly=System.ServiceModel"
- xmlns:s3="clr-namespace:System;assembly=System.ComponentModel.Composition"
- xmlns:s4="clr-namespace:System;assembly=System.Runtime.WindowsRuntime"
- xmlns:s5="clr-namespace:System;assembly=System"
- xmlns:s6="clr-namespace:System;assembly=System.Memory"
- xmlns:s7="clr-namespace:System;assembly=ClosedXML"
- xmlns:s8="clr-namespace:System;assembly=Microsoft.Bcl.AsyncInterfaces"
- xmlns:s9="clr-namespace:System;assembly=Microsoft.Bcl.HashCode"
- xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
- xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
- xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
- xmlns:sb="clr-namespace:System.Buffers;assembly=System.Memory"
- xmlns:sbb="clr-namespace:System.Buffers.Binary;assembly=System.Memory"
- xmlns:sbt="clr-namespace:System.Buffers.Text;assembly=System.Memory"
- xmlns:sc="clr-namespace:System.Collections;assembly=mscorlib"
- xmlns:sc1="clr-namespace:System.Configuration;assembly=System"
- xmlns:sc2="clr-namespace:System.ComponentModel;assembly=System"
- xmlns:sc3="clr-namespace:System.CodeDom;assembly=System"
- xmlns:sca="clr-namespace:System.Configuration.Assemblies;assembly=mscorlib"
- xmlns:scc="clr-namespace:System.Collections.Concurrent;assembly=mscorlib"
- xmlns:scc1="clr-namespace:System.Collections.Concurrent;assembly=System"
- xmlns:scc2="clr-namespace:System.CodeDom.Compiler;assembly=System"
- xmlns:scc3="clr-namespace:System.ComponentModel.Composition;assembly=System.ComponentModel.Composition"
- xmlns:scch="clr-namespace:System.ComponentModel.Composition.Hosting;assembly=System.ComponentModel.Composition"
- xmlns:sccp="clr-namespace:System.ComponentModel.Composition.Primitives;assembly=System.ComponentModel.Composition"
- xmlns:sccr="clr-namespace:System.ComponentModel.Composition.ReflectionModel;assembly=System.ComponentModel.Composition"
- xmlns:scd="clr-namespace:System.ComponentModel.Design;assembly=System"
- xmlns:scds="clr-namespace:System.ComponentModel.Design.Serialization;assembly=System"
- xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
- xmlns:scg1="clr-namespace:System.Collections.Generic;assembly=System.Core"
- xmlns:scg2="clr-namespace:System.Collections.Generic;assembly=System"
- xmlns:scg3="clr-namespace:System.Collections.Generic;assembly=Microsoft.Bcl.AsyncInterfaces"
- xmlns:scg4="clr-namespace:System.Collections.Generic;assembly=System.ServiceModel"
- xmlns:sci="clr-namespace:System.Collections.Immutable;assembly=System.Collections.Immutable"
- xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
- xmlns:sco1="clr-namespace:System.Collections.ObjectModel;assembly=System"
- xmlns:scs="clr-namespace:System.Collections.Specialized;assembly=System"
- xmlns:sd="clr-namespace:System.Diagnostics;assembly=mscorlib"
- xmlns:sd1="clr-namespace:System.Dynamic;assembly=System.Core"
- xmlns:sd2="clr-namespace:System.Diagnostics;assembly=System.Core"
- xmlns:sd3="clr-namespace:System.Diagnostics;assembly=System"
- xmlns:sd4="clr-namespace:System.Data;assembly=System.Data"
- xmlns:sd5="clr-namespace:System.Data;assembly=System.Data.DataSetExtensions"
- xmlns:sdc="clr-namespace:System.Diagnostics.Contracts;assembly=mscorlib"
- xmlns:sdc1="clr-namespace:System.Diagnostics.CodeAnalysis;assembly=mscorlib"
- xmlns:sdc2="clr-namespace:System.Diagnostics.CodeAnalysis;assembly=System"
- xmlns:sdc3="clr-namespace:System.Data.Common;assembly=System.Data"
- xmlns:sdci="clr-namespace:System.Diagnostics.Contracts.Internal;assembly=mscorlib"
- xmlns:sde="clr-namespace:System.Diagnostics.Eventing;assembly=System.Core"
- xmlns:sder="clr-namespace:System.Diagnostics.Eventing.Reader;assembly=System.Core"
- xmlns:sdi="clr-namespace:System.Deployment.Internal;assembly=mscorlib"
- xmlns:sdo="clr-namespace:System.Data.OleDb;assembly=System.Data"
- xmlns:sdo1="clr-namespace:System.Data.Odbc;assembly=System.Data"
- xmlns:sdp="clr-namespace:System.Diagnostics.PerformanceData;assembly=System.Core"
- xmlns:sds="clr-namespace:System.Diagnostics.SymbolStore;assembly=mscorlib"
- xmlns:sds1="clr-namespace:System.Data.Sql;assembly=System.Data"
- xmlns:sds2="clr-namespace:System.Data.SqlTypes;assembly=System.Data"
- xmlns:sds3="clr-namespace:System.Data.SqlClient;assembly=System.Data"
- xmlns:sdt="clr-namespace:System.Diagnostics.Tracing;assembly=mscorlib"
- xmlns:sg="clr-namespace:System.Globalization;assembly=mscorlib"
- xmlns:si="clr-namespace:System.IO;assembly=mscorlib"
- xmlns:si1="clr-namespace:System.IO;assembly=System.Core"
- xmlns:si2="clr-namespace:System.IO;assembly=System"
- xmlns:si3="clr-namespace:System.IO;assembly=System.ServiceModel"
- xmlns:si4="clr-namespace:System.IO;assembly=System.Runtime.WindowsRuntime"
- xmlns:sic="clr-namespace:System.IO.Compression;assembly=System"
- xmlns:sii="clr-namespace:System.IO.IsolatedStorage;assembly=mscorlib"
- xmlns:sim="clr-namespace:System.IO.MemoryMappedFiles;assembly=System.Core"
- xmlns:sip="clr-namespace:System.IO.Pipes;assembly=System.Core"
- xmlns:sip1="clr-namespace:System.IO.Ports;assembly=System"
- xmlns:sl="clr-namespace:System.Linq;assembly=System.Core"
- xmlns:sl1="clr-namespace:System.Linq;assembly=System.Collections.Immutable"
- xmlns:sle="clr-namespace:System.Linq.Expressions;assembly=System.Core"
- xmlns:sm="clr-namespace:System.Media;assembly=System"
- xmlns:smi="clr-namespace:System.Management.Instrumentation;assembly=System.Core"
- xmlns:sn="clr-namespace:System.Net;assembly=System"
- xmlns:snc="clr-namespace:System.Net.Cache;assembly=System"
- xmlns:snc1="clr-namespace:System.Net.Configuration;assembly=System"
- xmlns:snm="clr-namespace:System.Net.Mime;assembly=System"
- xmlns:snm1="clr-namespace:System.Net.Mail;assembly=System"
- xmlns:snn="clr-namespace:System.Net.NetworkInformation;assembly=System"
- xmlns:sns="clr-namespace:System.Net.Security;assembly=System"
- xmlns:sns1="clr-namespace:System.Net.Sockets;assembly=System"
- xmlns:snw="clr-namespace:System.Net.WebSockets;assembly=System"
- xmlns:sr="clr-namespace:System.Resources;assembly=mscorlib"
- xmlns:sr1="clr-namespace:System.Reflection;assembly=mscorlib"
- xmlns:sr2="clr-namespace:System.Runtime;assembly=mscorlib"
- xmlns:sr3="clr-namespace:System.Reflection;assembly=System"
- xmlns:src="clr-namespace:System.Runtime.ConstrainedExecution;assembly=mscorlib"
- xmlns:src1="clr-namespace:System.Runtime.CompilerServices;assembly=mscorlib"
- xmlns:src2="clr-namespace:System.Runtime.CompilerServices;assembly=System.Core"
- xmlns:src3="clr-namespace:System.Runtime.CompilerServices;assembly=Microsoft.Bcl.AsyncInterfaces"
- xmlns:src4="clr-namespace:System.Runtime.CompilerServices;assembly=System.ValueTuple"
- xmlns:srd="clr-namespace:System.Runtime.DesignerServices;assembly=mscorlib"
- xmlns:sre="clr-namespace:System.Reflection.Emit;assembly=mscorlib"
- xmlns:sre1="clr-namespace:System.Runtime.ExceptionServices;assembly=mscorlib"
- xmlns:srh="clr-namespace:System.Runtime.Hosting;assembly=mscorlib"
- xmlns:sri="clr-namespace:System.Runtime.InteropServices;assembly=mscorlib"
- xmlns:sri1="clr-namespace:System.Runtime.InteropServices;assembly=System.Core"
- xmlns:sri2="clr-namespace:System.Runtime.InteropServices;assembly=System"
- xmlns:sri3="clr-namespace:System.Runtime.InteropServices;assembly=System.Memory"
- xmlns:sric="clr-namespace:System.Runtime.InteropServices.ComTypes;assembly=mscorlib"
- xmlns:sric1="clr-namespace:System.Runtime.InteropServices.ComTypes;assembly=System"
- xmlns:srie="clr-namespace:System.Runtime.InteropServices.Expando;assembly=mscorlib"
- xmlns:sriw="clr-namespace:System.Runtime.InteropServices.WindowsRuntime;assembly=mscorlib"
- xmlns:sriw1="clr-namespace:System.Runtime.InteropServices.WindowsRuntime;assembly=System.Runtime.WindowsRuntime"
- xmlns:srr="clr-namespace:System.Runtime.Remoting;assembly=mscorlib"
- xmlns:srra="clr-namespace:System.Runtime.Remoting.Activation;assembly=mscorlib"
- xmlns:srrc="clr-namespace:System.Runtime.Remoting.Contexts;assembly=mscorlib"
- xmlns:srrc1="clr-namespace:System.Runtime.Remoting.Channels;assembly=mscorlib"
- xmlns:srrl="clr-namespace:System.Runtime.Remoting.Lifetime;assembly=mscorlib"
- xmlns:srrm="clr-namespace:System.Runtime.Remoting.Metadata;assembly=mscorlib"
- xmlns:srrm1="clr-namespace:System.Runtime.Remoting.Messaging;assembly=mscorlib"
- xmlns:srrmw="clr-namespace:System.Runtime.Remoting.Metadata.W3cXsd2001;assembly=mscorlib"
- xmlns:srrp="clr-namespace:System.Runtime.Remoting.Proxies;assembly=mscorlib"
- xmlns:srrs="clr-namespace:System.Runtime.Remoting.Services;assembly=mscorlib"
- xmlns:srs="clr-namespace:System.Runtime.Serialization;assembly=mscorlib"
- xmlns:srs1="clr-namespace:System.Runtime.Serialization;assembly=System.Runtime.Serialization"
- xmlns:srsc="clr-namespace:System.Runtime.Serialization.Configuration;assembly=System.Runtime.Serialization"
- xmlns:srsf="clr-namespace:System.Runtime.Serialization.Formatters;assembly=mscorlib"
- xmlns:srsfb="clr-namespace:System.Runtime.Serialization.Formatters.Binary;assembly=mscorlib"
- xmlns:srsj="clr-namespace:System.Runtime.Serialization.Json;assembly=System.Runtime.Serialization"
- xmlns:srv="clr-namespace:System.Runtime.Versioning;assembly=mscorlib"
- xmlns:srv1="clr-namespace:System.Runtime.Versioning;assembly=System"
- xmlns:ss="clr-namespace:System.Security;assembly=mscorlib"
- xmlns:ss1="clr-namespace:System.Security;assembly=System.Core"
- xmlns:ss2="clr-namespace:System.Security;assembly=System"
- xmlns:ss3="clr-namespace:System.ServiceModel;assembly=System.ServiceModel"
- xmlns:ssa="clr-namespace:System.Security.AccessControl;assembly=mscorlib"
- xmlns:ssa1="clr-namespace:System.Security.Authentication;assembly=System"
- xmlns:ssa2="clr-namespace:System.Security.AccessControl;assembly=System"
- xmlns:ssa3="clr-namespace:System.ServiceModel.Activation;assembly=System.ServiceModel"
- xmlns:ssac="clr-namespace:System.ServiceModel.Activation.Configuration;assembly=System.ServiceModel"
- xmlns:ssae="clr-namespace:System.Security.Authentication.ExtendedProtection;assembly=System"
- xmlns:ssaec="clr-namespace:System.Security.Authentication.ExtendedProtection.Configuration;assembly=System"
- xmlns:ssc="clr-namespace:System.Security.Cryptography;assembly=mscorlib"
- xmlns:ssc1="clr-namespace:System.Security.Claims;assembly=mscorlib"
- xmlns:ssc2="clr-namespace:System.Security.Cryptography;assembly=System.Core"
- xmlns:ssc3="clr-namespace:System.Security.Claims;assembly=System"
- xmlns:ssc4="clr-namespace:System.Security.Cryptography;assembly=System"
- xmlns:ssc5="clr-namespace:System.ServiceModel.ComIntegration;assembly=System.ServiceModel"
- xmlns:ssc6="clr-namespace:System.ServiceModel.Configuration;assembly=System.ServiceModel"
- xmlns:ssc7="clr-namespace:System.ServiceModel.Channels;assembly=System.ServiceModel"
- xmlns:sscx="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=mscorlib"
- xmlns:sscx1="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=System.Core"
- xmlns:sscx2="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=System"
- xmlns:ssd="clr-namespace:System.ServiceModel.Description;assembly=System.ServiceModel"
- xmlns:ssd1="clr-namespace:System.ServiceModel.Dispatcher;assembly=System.ServiceModel"
- xmlns:ssd2="clr-namespace:System.ServiceModel.Diagnostics;assembly=System.ServiceModel"
- xmlns:ssm="clr-namespace:System.ServiceModel.MsmqIntegration;assembly=System.ServiceModel"
- xmlns:ssp="clr-namespace:System.Security.Permissions;assembly=mscorlib"
- xmlns:ssp1="clr-namespace:System.Security.Principal;assembly=mscorlib"
- xmlns:ssp2="clr-namespace:System.Security.Policy;assembly=mscorlib"
- xmlns:ssp3="clr-namespace:System.Security.Permissions;assembly=System"
- xmlns:ssp4="clr-namespace:System.ServiceModel.PeerResolvers;assembly=System.ServiceModel"
- xmlns:sss="clr-namespace:System.ServiceModel.Syndication;assembly=System.ServiceModel"
- xmlns:sss1="clr-namespace:System.ServiceModel.Security;assembly=System.ServiceModel"
- xmlns:ssst="clr-namespace:System.ServiceModel.Security.Tokens;assembly=System.ServiceModel"
- xmlns:ssx="clr-namespace:System.ServiceModel.XamlIntegration;assembly=System.ServiceModel"
- xmlns:st="clr-namespace:System.Threading;assembly=mscorlib"
- xmlns:st1="clr-namespace:System.Text;assembly=mscorlib"
- xmlns:st2="clr-namespace:System.Threading;assembly=System.Core"
- xmlns:st3="clr-namespace:System.Timers;assembly=System"
- xmlns:st4="clr-namespace:System.Threading;assembly=System"
- xmlns:st5="clr-namespace:System.Threading;assembly=System.Runtime.WindowsRuntime"
- xmlns:str="clr-namespace:System.Text.RegularExpressions;assembly=System"
- xmlns:stt="clr-namespace:System.Threading.Tasks;assembly=mscorlib"
- xmlns:stt1="clr-namespace:System.Threading.Tasks;assembly=System.Core"
- xmlns:stt2="clr-namespace:System.Threading.Tasks;assembly=Microsoft.Bcl.AsyncInterfaces"
- xmlns:stts="clr-namespace:System.Threading.Tasks.Sources;assembly=Microsoft.Bcl.AsyncInterfaces"
- xmlns:sw="clr-namespace:System.Web;assembly=System"
- xmlns:swi="clr-namespace:System.Windows.Input;assembly=System"
- xmlns:swm="clr-namespace:System.Windows.Markup;assembly=System"
- xmlns:sx="clr-namespace:System.Xml;assembly=System.Xml"
- xmlns:sx1="clr-namespace:System.Xml;assembly=System.Runtime.Serialization"
- xmlns:sx2="clr-namespace:System.Xml;assembly=System.Data"
- xmlns:sxr="clr-namespace:System.Xml.Resolvers;assembly=System.Xml"
- xmlns:sxs="clr-namespace:System.Xml.Serialization;assembly=System.Xml"
- xmlns:sxs1="clr-namespace:System.Xml.Schema;assembly=System.Xml"
- xmlns:sxsa="clr-namespace:System.Xml.Serialization.Advanced;assembly=System.Xml"
- xmlns:sxsc="clr-namespace:System.Xml.Serialization.Configuration;assembly=System.Xml"
- xmlns:sxx="clr-namespace:System.Xml.Xsl;assembly=System.Xml"
- xmlns:sxx1="clr-namespace:System.Xml.XPath;assembly=System.Xml"
- xmlns:sxx2="clr-namespace:System.Xml.XmlConfiguration;assembly=System.Xml"
- xmlns:wf="clr-namespace:Windows.Foundation;assembly=System.Runtime.WindowsRuntime"
- xmlns:wu="clr-namespace:Windows.UI;assembly=System.Runtime.WindowsRuntime"
- xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <TextExpression.NamespacesForImplementation>
-    <sco:Collection x:TypeArguments="x:String">
+xaml_template = """<Activity mc1:Ignorable="sads sap sap2010" x:Class="openurl_uipath.xaml"
+  sap2010:WorkflowViewState.IdRef="새_워크플로우_1"
+  mva1:VisualBasic.Settings="Assembly references and imported namespaces serialized as XML namespaces"
+  xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+  xmlns:b="clr-namespace:beBOT;assembly=beBOT"
+  xmlns:b1="clr-namespace:beBOT;assembly=beBOT.Interfaces"
+  xmlns:ba="clr-namespace:beBOT.Activities;assembly=beBOT"
+  xmlns:bi="clr-namespace:beBOT.Image;assembly=beBOT.Image"
+  xmlns:bd="clr-namespace:beBOT.Database;assembly=beBOT.Database"
+  xmlns:bi1="clr-namespace:beBOT.Interfaces;assembly=beBOT.Interfaces"
+  xmlns:bi2="clr-namespace:beBOT.Interfaces;assembly=beBOT.Interfaces"
+  xmlns:bia="clr-namespace:beBOT.Interfaces.Activities;assembly=beBOT.Interfaces"
+  xmlns:bie="clr-namespace:beBOT.Interfaces.entity;assembly=beBOT.Interfaces"
+  xmlns:bii="clr-namespace:beBOT.Interfaces.IPCService;assembly=beBOT.Interfaces"
+  xmlns:bii1="clr-namespace:beBOT.Interfaces.Input;assembly=beBOT.Interfaces"
+  xmlns:bii2="clr-namespace:beBOT.Interfaces.Image;assembly=beBOT.Interfaces"
+  xmlns:bim="clr-namespace:beBOT.Interfaces.mq;assembly=beBOT.Interfaces"
+  xmlns:bio="clr-namespace:beBOT.Interfaces.Overlay;assembly=beBOT.Interfaces"
+  xmlns:bir="clr-namespace:beBOT.Interfaces.Resources;assembly=beBOT.Interfaces"
+  xmlns:bis="clr-namespace:beBOT.Interfaces.Selector;assembly=beBOT.Interfaces"
+  xmlns:biv="clr-namespace:beBOT.Interfaces.VT;assembly=beBOT.Interfaces"
+  xmlns:biv1="clr-namespace:beBOT.Interfaces.Views;assembly=beBOT.Interfaces"
+  xmlns:biw="clr-namespace:beBOT.Interfaces.win32;assembly=beBOT.Interfaces"
+  xmlns:bn="clr-namespace:beBOT.NM;assembly=beBOT.NM"
+  xmlns:bna="clr-namespace:beBOT.NM.Activities;assembly=beBOT.NM"
+  xmlns:bnp="clr-namespace:beBOT.NM.pipe;assembly=beBOT.NM"
+  xmlns:bnr="clr-namespace:beBOT.NM.Resources;assembly=beBOT.NM"
+  xmlns:bns="clr-namespace:beBOT.NM.Snippets;assembly=beBOT.NM"
+  xmlns:bnv="clr-namespace:beBOT.NM.Views;assembly=beBOT.NM"
+  xmlns:br="clr-namespace:beBOT.Resources;assembly=beBOT"
+  xmlns:bs="clr-namespace:beBOT.Store;assembly=beBOT"
+  xmlns:bv="clr-namespace:beBOT.Views;assembly=beBOT"
+  xmlns:bv1="clr-namespace:beBOT.ViewModel;assembly=beBOT"
+  xmlns:bw="clr-namespace:beBOT.WorkItems;assembly=beBOT"
+  xmlns:boa="clr-namespace:beBOT.Office.Activities;assembly=beBOT.Office"
+  xmlns:bu="clr-namespace:beBOT.Utilities;assembly=beBOT.Utilities"
+  xmlns:bm="clr-namespace:beBOT.Mail;assembly=beBOT.Mail"
+  xmlns:bi3="clr-namespace:beBOT.Image;assembly=beBOT.Image"
+  xmlns:c="clr-namespace:Costura;assembly=OpenRPA.NM"
+  xmlns:m="clr-namespace:ManagedSSPI;assembly=System.Net.WebSockets.Client.Managed"
+  xmlns:mc="clr-namespace:Microsoft.CSharp;assembly=System"
+  xmlns:mc1="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:mss="clr-namespace:Microsoft.SqlServer.Server;assembly=System.Data"
+  xmlns:mv="clr-namespace:Microsoft.VisualBasic;assembly=System"
+  xmlns:mv1="clr-namespace:Microsoft.VisualBasic;assembly=Microsoft.VisualBasic"
+  xmlns:mva="clr-namespace:Microsoft.VisualBasic.ApplicationServices;assembly=Microsoft.VisualBasic"
+  xmlns:mva1="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+  xmlns:mvc="clr-namespace:Microsoft.VisualBasic.CompilerServices;assembly=Microsoft.VisualBasic"
+  xmlns:mvd="clr-namespace:Microsoft.VisualBasic.Devices;assembly=Microsoft.VisualBasic"
+  xmlns:mvf="clr-namespace:Microsoft.VisualBasic.FileIO;assembly=Microsoft.VisualBasic"
+  xmlns:mvl="clr-namespace:Microsoft.VisualBasic.Logging;assembly=Microsoft.VisualBasic"
+  xmlns:mvm="clr-namespace:Microsoft.VisualBasic.MyServices;assembly=Microsoft.VisualBasic"
+  xmlns:mvmi="clr-namespace:Microsoft.VisualBasic.MyServices.Internal;assembly=Microsoft.VisualBasic"
+  xmlns:mw="clr-namespace:Microsoft.Win32;assembly=mscorlib"
+  xmlns:mw1="clr-namespace:Microsoft.Win32;assembly=System"
+  xmlns:mws="clr-namespace:Microsoft.Win32.SafeHandles;assembly=mscorlib"
+  xmlns:mws1="clr-namespace:Microsoft.Win32.SafeHandles;assembly=System.Core"
+  xmlns:mws2="clr-namespace:Microsoft.Win32.SafeHandles;assembly=System"
+  xmlns:o="clr-namespace:OpenRPA;assembly=OpenRPA"
+  xmlns:o1="clr-namespace:OpenRPA;assembly=OpenRPA.Interfaces"
+  xmlns:ou="clr-namespace:OpenRPA.Utilities;assembly=OpenRPA.Utilities"
+  xmlns:oa="clr-namespace:OpenRPA.Activities;assembly=OpenRPA"
+  xmlns:oi="clr-namespace:OpenRPA.Image;assembly=OpenRPA.Image"
+  xmlns:oi1="clr-namespace:OpenRPA.Interfaces;assembly=OpenRPA.Interfaces"
+  xmlns:oi2="clr-namespace:OpenRPA.IE;assembly=OpenRPA.IE"
+  xmlns:oia="clr-namespace:OpenRPA.Interfaces.Activities;assembly=OpenRPA.Interfaces"
+  xmlns:oie="clr-namespace:OpenRPA.Interfaces.entity;assembly=OpenRPA.Interfaces"
+  xmlns:oii="clr-namespace:OpenRPA.Interfaces.IPCService;assembly=OpenRPA.Interfaces"
+  xmlns:oii1="clr-namespace:OpenRPA.Interfaces.Input;assembly=OpenRPA.Interfaces"
+  xmlns:oii2="clr-namespace:OpenRPA.Interfaces.Image;assembly=OpenRPA.Interfaces"
+  xmlns:oim="clr-namespace:OpenRPA.Interfaces.mq;assembly=OpenRPA.Interfaces"
+  xmlns:oio="clr-namespace:OpenRPA.Interfaces.Overlay;assembly=OpenRPA.Interfaces"
+  xmlns:oir="clr-namespace:OpenRPA.Interfaces.Resources;assembly=OpenRPA.Interfaces"
+  xmlns:ois="clr-namespace:OpenRPA.Interfaces.Selector;assembly=OpenRPA.Interfaces"
+  xmlns:oiv="clr-namespace:OpenRPA.Interfaces.Views;assembly=OpenRPA.Interfaces"
+  xmlns:oiw="clr-namespace:OpenRPA.Interfaces.win32;assembly=OpenRPA.Interfaces"
+  xmlns:on="clr-namespace:OpenRPA.NM;assembly=OpenRPA.NM"
+  xmlns:ona="clr-namespace:OpenRPA.NM.Activities;assembly=OpenRPA.NM"
+  xmlns:onp="clr-namespace:OpenRPA.NM.pipe;assembly=OpenRPA.NM"
+  xmlns:onr="clr-namespace:OpenRPA.NM.Resources;assembly=OpenRPA.NM"
+  xmlns:ons="clr-namespace:OpenRPA.NM.Snippets;assembly=OpenRPA.NM"
+  xmlns:onv="clr-namespace:OpenRPA.NM.Views;assembly=OpenRPA.NM"
+  xmlns:oo="clr-namespace:OpenRPA.OpenFlowDB;assembly=OpenRPA.OpenFlowDB"
+  xmlns:ooa="clr-namespace:OpenRPA.Office.Activities;assembly=OpenRPA.Office"
+  xmlns:or="clr-namespace:OpenRPA.Resources;assembly=OpenRPA"
+  xmlns:os="clr-namespace:OpenRPA.Store;assembly=OpenRPA"
+  xmlns:ov="clr-namespace:OpenRPA.Views;assembly=OpenRPA"
+  xmlns:ov1="clr-namespace:OpenRPA.ViewModel;assembly=OpenRPA"
+  xmlns:ow="clr-namespace:OpenRPA.WorkItems;assembly=OpenRPA"
+  xmlns:p="clr-namespace:XamlGeneratedNamespace;assembly=OpenRPA"
+  xmlns:s="clr-namespace:System;assembly=mscorlib"
+  xmlns:s1="clr-namespace:System;assembly=System.Core"
+  xmlns:s2="clr-namespace:System;assembly=System"
+  xmlns:s3="clr-namespace:System;assembly=System.Memory"
+  xmlns:s4="clr-namespace:System;assembly=Microsoft.Bcl.AsyncInterfaces"
+  xmlns:s5="clr-namespace:System;assembly=Microsoft.Bcl.HashCode"
+  xmlns:s6="clr-namespace:System;assembly=System.ValueTuple"
+  xmlns:s7="clr-namespace:System;assembly=System.ServiceModel"
+  xmlns:s8="clr-namespace:System;assembly=System.ComponentModel.Composition"
+  xmlns:s9="clr-namespace:System;assembly=System.Net.WebSockets.Client.Managed"
+  xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+  xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+  xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+  xmlns:sb="clr-namespace:System.Buffers;assembly=System.Memory"
+  xmlns:sbb="clr-namespace:System.Buffers.Binary;assembly=System.Memory"
+  xmlns:sbt="clr-namespace:System.Buffers.Text;assembly=System.Memory"
+  xmlns:sc="clr-namespace:System.Collections;assembly=mscorlib"
+  xmlns:sc1="clr-namespace:System.Configuration;assembly=System"
+  xmlns:sc2="clr-namespace:System.ComponentModel;assembly=System"
+  xmlns:sc3="clr-namespace:System.CodeDom;assembly=System"
+  xmlns:sca="clr-namespace:System.Configuration.Assemblies;assembly=mscorlib"
+  xmlns:scc="clr-namespace:System.Collections.Concurrent;assembly=mscorlib"
+  xmlns:scc1="clr-namespace:System.Collections.Concurrent;assembly=System"
+  xmlns:scc2="clr-namespace:System.CodeDom.Compiler;assembly=System"
+  xmlns:scc3="clr-namespace:System.ComponentModel.Composition;assembly=System.ComponentModel.Composition"
+  xmlns:scch="clr-namespace:System.ComponentModel.Composition.Hosting;assembly=System.ComponentModel.Composition"
+  xmlns:sccp="clr-namespace:System.ComponentModel.Composition.Primitives;assembly=System.ComponentModel.Composition"
+  xmlns:sccr="clr-namespace:System.ComponentModel.Composition.ReflectionModel;assembly=System.ComponentModel.Composition"
+  xmlns:scd="clr-namespace:System.ComponentModel.Design;assembly=System"
+  xmlns:scds="clr-namespace:System.ComponentModel.Design.Serialization;assembly=System"
+  xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+  xmlns:scg1="clr-namespace:System.Collections.Generic;assembly=System.Core"
+  xmlns:scg2="clr-namespace:System.Collections.Generic;assembly=System"
+  xmlns:scg3="clr-namespace:System.Collections.Generic;assembly=Microsoft.Bcl.AsyncInterfaces"
+  xmlns:scg4="clr-namespace:System.Collections.Generic;assembly=System.ServiceModel"
+  xmlns:sci="clr-namespace:System.Collections.Immutable;assembly=System.Collections.Immutable"
+  xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+  xmlns:sco1="clr-namespace:System.Collections.ObjectModel;assembly=System"
+  xmlns:scs="clr-namespace:System.Collections.Specialized;assembly=System"
+  xmlns:sd="clr-namespace:System.Data;assembly=System.Data"
+  xmlns:sd1="clr-namespace:System.Dynamic;assembly=System.Core"
+  xmlns:sd2="clr-namespace:System.Diagnostics;assembly=System.Core"
+  xmlns:sd3="clr-namespace:System.Diagnostics;assembly=System"
+  xmlns:sd4="clr-namespace:System.Data;assembly=System.Data"
+  xmlns:sdc="clr-namespace:System.Diagnostics.Contracts;assembly=mscorlib"
+  xmlns:sdc1="clr-namespace:System.Diagnostics.CodeAnalysis;assembly=mscorlib"
+  xmlns:sdc2="clr-namespace:System.Diagnostics.CodeAnalysis;assembly=System"
+  xmlns:sdc3="clr-namespace:System.Data.Common;assembly=System.Data"
+  xmlns:sdci="clr-namespace:System.Diagnostics.Contracts.Internal;assembly=mscorlib"
+  xmlns:sde="clr-namespace:System.Diagnostics.Eventing;assembly=System.Core"
+  xmlns:sder="clr-namespace:System.Diagnostics.Eventing.Reader;assembly=System.Core"
+  xmlns:sdi="clr-namespace:System.Deployment.Internal;assembly=mscorlib"
+  xmlns:sdo="clr-namespace:System.Data.OleDb;assembly=System.Data"
+  xmlns:sdo1="clr-namespace:System.Data.Odbc;assembly=System.Data"
+  xmlns:sdp="clr-namespace:System.Diagnostics.PerformanceData;assembly=System.Core"
+  xmlns:sds="clr-namespace:System.Diagnostics.SymbolStore;assembly=mscorlib"
+  xmlns:sds1="clr-namespace:System.Data.Sql;assembly=System.Data"
+  xmlns:sds2="clr-namespace:System.Data.SqlTypes;assembly=System.Data"
+  xmlns:sds3="clr-namespace:System.Data.SqlClient;assembly=System.Data"
+  xmlns:sdt="clr-namespace:System.Diagnostics.Tracing;assembly=mscorlib"
+  xmlns:sg="clr-namespace:System.Globalization;assembly=mscorlib"
+  xmlns:si="clr-namespace:System.IO;assembly=mscorlib"
+  xmlns:si1="clr-namespace:System.IO;assembly=System.Core"
+  xmlns:si2="clr-namespace:System.IO;assembly=System"
+  xmlns:si3="clr-namespace:System.IO;assembly=System.ServiceModel"
+  xmlns:sic="clr-namespace:System.IO.Compression;assembly=System"
+  xmlns:sii="clr-namespace:System.IO.IsolatedStorage;assembly=mscorlib"
+  xmlns:sim="clr-namespace:System.IO.MemoryMappedFiles;assembly=System.Core"
+  xmlns:sip="clr-namespace:System.IO.Pipes;assembly=System.Core"
+  xmlns:sip1="clr-namespace:System.IO.Ports;assembly=System"
+  xmlns:sl="clr-namespace:System.Linq;assembly=System.Core"
+  xmlns:sl1="clr-namespace:System.Linq;assembly=System.Collections.Immutable"
+  xmlns:sle="clr-namespace:System.Linq.Expressions;assembly=System.Core"
+  xmlns:sm="clr-namespace:System.Media;assembly=System"
+  xmlns:smi="clr-namespace:System.Management.Instrumentation;assembly=System.Core"
+  xmlns:sn="clr-namespace:System.Net;assembly=System"
+  xmlns:snc="clr-namespace:System.Net.Cache;assembly=System"
+  xmlns:snc1="clr-namespace:System.Net.Configuration;assembly=System"
+  xmlns:snm="clr-namespace:System.Net.Mail;assembly=System"
+  xmlns:snm1="clr-namespace:System.Net.Mail;assembly=System"
+  xmlns:snn="clr-namespace:System.Net.NetworkInformation;assembly=System"
+  xmlns:sns="clr-namespace:System.Net.Security;assembly=System"
+  xmlns:sns1="clr-namespace:System.Net.Sockets;assembly=System"
+  xmlns:snw="clr-namespace:System.Net.WebSockets;assembly=System"
+  xmlns:snw1="clr-namespace:System.Net.WebSockets;assembly=System.Net.WebSockets.Client.Managed"
+  xmlns:snwm="clr-namespace:System.Net.WebSockets.Managed;assembly=System.Net.WebSockets.Client.Managed"
+  xmlns:sr="clr-namespace:System.Resources;assembly=mscorlib"
+  xmlns:sr1="clr-namespace:System.Reflection;assembly=mscorlib"
+  xmlns:sr2="clr-namespace:System.Runtime;assembly=mscorlib"
+  xmlns:sr3="clr-namespace:System.Reflection;assembly=System"
+  xmlns:src="clr-namespace:System.Runtime.ConstrainedExecution;assembly=mscorlib"
+  xmlns:src1="clr-namespace:System.Runtime.CompilerServices;assembly=mscorlib"
+  xmlns:src2="clr-namespace:System.Runtime.CompilerServices;assembly=System.Core"
+  xmlns:src3="clr-namespace:System.Runtime.CompilerServices;assembly=Microsoft.Bcl.AsyncInterfaces"
+  xmlns:src4="clr-namespace:System.Runtime.CompilerServices;assembly=System.ValueTuple"
+  xmlns:srd="clr-namespace:System.Runtime.DesignerServices;assembly=mscorlib"
+  xmlns:sre="clr-namespace:System.Reflection.Emit;assembly=mscorlib"
+  xmlns:sre1="clr-namespace:System.Runtime.ExceptionServices;assembly=mscorlib"
+  xmlns:srh="clr-namespace:System.Runtime.Hosting;assembly=mscorlib"
+  xmlns:sri="clr-namespace:System.Runtime.InteropServices;assembly=mscorlib"
+  xmlns:sri1="clr-namespace:System.Runtime.InteropServices;assembly=System.Core"
+  xmlns:sri2="clr-namespace:System.Runtime.InteropServices;assembly=System"
+  xmlns:sri3="clr-namespace:System.Runtime.InteropServices;assembly=System.Memory"
+  xmlns:sric="clr-namespace:System.Runtime.InteropServices.ComTypes;assembly=mscorlib"
+  xmlns:sric1="clr-namespace:System.Runtime.InteropServices.ComTypes;assembly=System"
+  xmlns:srie="clr-namespace:System.Runtime.InteropServices.Expando;assembly=mscorlib"
+  xmlns:sriw="clr-namespace:System.Runtime.InteropServices.WindowsRuntime;assembly=mscorlib"
+  xmlns:srr="clr-namespace:System.Runtime.Remoting;assembly=mscorlib"
+  xmlns:srra="clr-namespace:System.Runtime.Remoting.Activation;assembly=mscorlib"
+  xmlns:srrc="clr-namespace:System.Runtime.Remoting.Contexts;assembly=mscorlib"
+  xmlns:srrc1="clr-namespace:System.Runtime.Remoting.Channels;assembly=mscorlib"
+  xmlns:srrl="clr-namespace:System.Runtime.Remoting.Lifetime;assembly=mscorlib"
+  xmlns:srrm="clr-namespace:System.Runtime.Remoting.Metadata;assembly=mscorlib"
+  xmlns:srrm1="clr-namespace:System.Runtime.Remoting.Messaging;assembly=mscorlib"
+  xmlns:srrmw="clr-namespace:System.Runtime.Remoting.Metadata.W3cXsd2001;assembly=mscorlib"
+  xmlns:srrp="clr-namespace:System.Runtime.Remoting.Proxies;assembly=mscorlib"
+  xmlns:srrs="clr-namespace:System.Runtime.Remoting.Services;assembly=mscorlib"
+  xmlns:srs="clr-namespace:System.Runtime.Serialization;assembly=mscorlib"
+  xmlns:srs1="clr-namespace:System.Runtime.Serialization;assembly=System.Runtime.Serialization"
+  xmlns:srsc="clr-namespace:System.Runtime.Serialization.Configuration;assembly=System.Runtime.Serialization"
+  xmlns:srsf="clr-namespace:System.Runtime.Serialization.Formatters;assembly=mscorlib"
+  xmlns:srsfb="clr-namespace:System.Runtime.Serialization.Formatters.Binary;assembly=mscorlib"
+  xmlns:srsj="clr-namespace:System.Runtime.Serialization.Json;assembly=System.Runtime.Serialization"
+  xmlns:srv="clr-namespace:System.Runtime.Versioning;assembly=mscorlib"
+  xmlns:srv1="clr-namespace:System.Runtime.Versioning;assembly=System"
+  xmlns:ss="clr-namespace:System.Security;assembly=mscorlib"
+  xmlns:ss1="clr-namespace:System.Security;assembly=System.Core"
+  xmlns:ss2="clr-namespace:System.Security;assembly=System"
+  xmlns:ss3="clr-namespace:System.ServiceModel;assembly=System.ServiceModel"
+  xmlns:ssa="clr-namespace:System.Security.AccessControl;assembly=mscorlib"
+  xmlns:ssa1="clr-namespace:System.Security.Authentication;assembly=System"
+  xmlns:ssa2="clr-namespace:System.Security.AccessControl;assembly=System"
+  xmlns:ssa3="clr-namespace:System.ServiceModel.Activation;assembly=System.ServiceModel"
+  xmlns:ssac="clr-namespace:System.ServiceModel.Activation.Configuration;assembly=System.ServiceModel"
+  xmlns:ssae="clr-namespace:System.Security.Authentication.ExtendedProtection;assembly=System"
+  xmlns:ssaec="clr-namespace:System.Security.Authentication.ExtendedProtection.Configuration;assembly=System"
+  xmlns:ssc="clr-namespace:System.Security.Cryptography;assembly=mscorlib"
+  xmlns:ssc1="clr-namespace:System.Security.Claims;assembly=mscorlib"
+  xmlns:ssc2="clr-namespace:System.Security.Cryptography;assembly=System.Core"
+  xmlns:ssc3="clr-namespace:System.Security.Claims;assembly=System"
+  xmlns:ssc4="clr-namespace:System.Security.Cryptography;assembly=System"
+  xmlns:ssc5="clr-namespace:System.ServiceModel.ComIntegration;assembly=System.ServiceModel"
+  xmlns:ssc6="clr-namespace:System.ServiceModel.Configuration;assembly=System.ServiceModel"
+  xmlns:ssc7="clr-namespace:System.ServiceModel.Channels;assembly=System.ServiceModel"
+  xmlns:sscx="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=mscorlib"
+  xmlns:sscx1="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=System.Core"
+  xmlns:sscx2="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=System"
+  xmlns:ssd="clr-namespace:System.ServiceModel.Description;assembly=System.ServiceModel"
+  xmlns:ssd1="clr-namespace:System.ServiceModel.Dispatcher;assembly=System.ServiceModel"
+  xmlns:ssd2="clr-namespace:System.ServiceModel.Diagnostics;assembly=System.ServiceModel"
+  xmlns:ssm="clr-namespace:System.ServiceModel.MsmqIntegration;assembly=System.ServiceModel"
+  xmlns:ssp="clr-namespace:System.Security.Permissions;assembly=mscorlib"
+  xmlns:ssp1="clr-namespace:System.Security.Principal;assembly=mscorlib"
+  xmlns:ssp2="clr-namespace:System.Security.Policy;assembly=mscorlib"
+  xmlns:ssp3="clr-namespace:System.Security.Permissions;assembly=System"
+  xmlns:ssp4="clr-namespace:System.ServiceModel.PeerResolvers;assembly=System.ServiceModel"
+  xmlns:sss="clr-namespace:System.ServiceModel.Syndication;assembly=System.ServiceModel"
+  xmlns:sss1="clr-namespace:System.ServiceModel.Security;assembly=System.ServiceModel"
+  xmlns:ssst="clr-namespace:System.ServiceModel.Security.Tokens;assembly=System.ServiceModel"
+  xmlns:ssx="clr-namespace:System.ServiceModel.XamlIntegration;assembly=System.ServiceModel"
+  xmlns:st="clr-namespace:System.Threading;assembly=mscorlib"
+  xmlns:st1="clr-namespace:System.Text;assembly=mscorlib"
+  xmlns:st2="clr-namespace:System.Threading;assembly=System.Core"
+  xmlns:st3="clr-namespace:System.Timers;assembly=System"
+  xmlns:st4="clr-namespace:System.Threading;assembly=System"
+  xmlns:str="clr-namespace:System.Text.RegularExpressions;assembly=System"
+  xmlns:stt="clr-namespace:System.Threading.Tasks;assembly=mscorlib"
+  xmlns:stt1="clr-namespace:System.Threading.Tasks;assembly=System.Core"
+  xmlns:stt2="clr-namespace:System.Threading.Tasks;assembly=Microsoft.Bcl.AsyncInterfaces"
+  xmlns:stts="clr-namespace:System.Threading.Tasks.Sources;assembly=Microsoft.Bcl.AsyncInterfaces"
+  xmlns:sw="clr-namespace:System.Web;assembly=System"
+  xmlns:swi="clr-namespace:System.Windows.Input;assembly=System"
+  xmlns:swm="clr-namespace:System.Web.Mail;assembly=System.Web"
+  xmlns:sx="clr-namespace:System.Xml;assembly=System.Xml"
+  xmlns:sx1="clr-namespace:System.Xml;assembly=System.Runtime.Serialization"
+  xmlns:sx2="clr-namespace:System.Xml;assembly=System.Data"
+  xmlns:sxr="clr-namespace:System.Xml.Resolvers;assembly=System.Xml"
+  xmlns:sxs="clr-namespace:System.Xml.Serialization;assembly=System.Xml"
+  xmlns:sxs1="clr-namespace:System.Xml.Schema;assembly=System.Xml"
+  xmlns:sxsa="clr-namespace:System.Xml.Serialization.Advanced;assembly=System.Xml"
+  xmlns:sxsc="clr-namespace:System.Xml.Serialization.Configuration;assembly=System.Xml"
+  xmlns:sxx="clr-namespace:System.Xml.Xsl;assembly=System.Xml"
+  xmlns:sxx1="clr-namespace:System.Xml.XPath;assembly=System.Xml"
+  xmlns:sxx2="clr-namespace:System.Xml.XmlConfiguration;assembly=System.Xml"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments=\"x:String\">
       <x:String>System</x:String>
       <x:String>System.Xml</x:String>
       <x:String>beBOT</x:String>
       <x:String>System.Data</x:String>
       <x:String>System.Linq</x:String>
       <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>beBOT.Image</x:String>
     </sco:Collection>
   </TextExpression.NamespacesForImplementation>
   <TextExpression.ReferencesForImplementation>
-    <sco:Collection x:TypeArguments="AssemblyReference">
+    <sco:Collection x:TypeArguments=\"AssemblyReference\">
       <AssemblyReference>mscorlib</AssemblyReference>
       <AssemblyReference>System.Xml</AssemblyReference>
       <AssemblyReference>beBOT</AssemblyReference>
@@ -324,6 +350,17 @@ xaml_template = """<Activity mc1:Ignorable="sads sap sap2010" x:Class="New_Workf
       <AssemblyReference>System.Core</AssemblyReference>
       <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
       <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>ClosedXML</AssemblyReference>
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>Microsoft.Bcl.HashCode</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.Net.WebSockets.Client.Managed</AssemblyReference>
+      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
+      <AssemblyReference>beBOT.Image</AssemblyReference>
+      <AssemblyReference>System.Activities</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
   {custom_code}
@@ -808,27 +845,25 @@ def rag_chain(query):
     # return gpt_llm(question, formatted_context)
     return gpt_llm(query)
 
-# Define the Gradio interface
-def get_important_facts(query):
-    xmlresult = rag_chain(query)
-    # print(xmlresult)
-    return xmlresult
+
 
 
 # Create a Gradio app interface
-iface = gr.Interface(
-  fn=get_important_facts,
-  inputs=gr.Textbox(lines=2, placeholder="Enter your question here..."),
-  outputs="text",
-  title="blueAI",
-  description="Ask questions about the proveded context",
-)
+# iface = gr.Interface(
+#   fn=get_important_facts,
+#   inputs=gr.Textbox(lines=2, placeholder="Enter your question here..."),
+#   outputs="text",
+#   title="blueAI",
+#   description="Ask questions about the proveded context",
+# )
 
 # Launch the Gradio app
 # iface.launch()
-question = input()
-xmlresult = get_important_facts(question)
-xmlresult
+
+### 실행 라인!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# question = input()
+# xmlresult = get_important_facts(question)
+# xmlresult
 import html
 
 """# 여기까지가 xaml을 출력하는 부 입니다.
@@ -874,7 +909,7 @@ def convert_xml_to_html_entities(xml_str):
 
         # title 속성 값 추출
         title_value = selector[title_start:title_end]
-        # print(title_value)
+        print(title_value)
         # title 속성 값에서 <와 >를 &lt;와 &gt;, "를 &quot;로 대체
         # title_value = title_value.replace(r"\&quot;", "&quot;").replace("<", "&lt;").replace(">", "&gt;")
 
@@ -895,8 +930,6 @@ def convert_xml_to_html_entities(xml_str):
 
 
 
-final_output_xaml = xaml_template.format(custom_code=xmlresult)
-
 
 
 
@@ -916,35 +949,8 @@ def get_current_time():
     currented_time = datetime.now(timezone(timedelta(hours=9)))
     # ISO 8601 형식으로 변환
     return currented_time.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
-
-# 템플릿에 값 채우기
-json_template["Xaml"] = final_output_xaml
-json_template["Filename"] = json_template["Filename"].format(question=question)
-json_template["projectandname"] = json_template["projectandname"].format(question=question)
-json_template["FilePath"] = json_template["FilePath"].format(question=question)
-json_template["name"] = json_template["name"].format(question=question)
-json_template["_created"] = get_current_time()
-
-# 결과 확인
-final_json_str = json.dumps(json_template, ensure_ascii=False, indent=2)
-# print(final_json_str)
-
-# 필요하다면 파일로 저장
-output_directory = "/content/blueAI_createdJson"
-os.makedirs(output_directory, exist_ok=True)
-file_path = os.path.join(output_directory, f"{question}.json")
-
-with open(file_path, 'w', encoding='utf-8') as json_file:
-    json_file.write(final_json_str)
-
-
-
-print(f"JSON 파일이 {file_path}에 저장되었습니다.")
-
-# XML 데이터를 HTML 엔티티로 변환 후 출력
-# converted_xml_data = convert_xml_to_html_entities(xmlresult)
-# print(converted_xml_data)
-
+  
+  
 
 # 저장한 JSON 파일을 읽어오는 함수
 def read_json(file_path):
@@ -958,24 +964,62 @@ def save_json(file_path, data):
         json.dump(data, json_file, ensure_ascii=False, indent=2)
     print(f"JSON 파일이 {file_path}에 저장되었습니다.")
 
-# 파일 경로 설정 (여기서는 예시로 '/content/blueAI_createdJson/네이버에서 사과를 검색해줘.json'로 가정)
-# 파일 경로 설정 (D 드라이브의 content 폴더 내에 위치)
-output_directory = "D:/content/blueAI_createdJson/"+question+".json"
-# file_path = os.path.join(output_directory, question)
-file_path = "D:/content/blueAI_createdJson/"+question+".json"
+# 템플릿에 값 채우기
+def set_json_template(question, final_output_xaml):
+  json_template["Xaml"] = final_output_xaml
+  json_template["Filename"] = json_template["Filename"].format(question=question)
+  json_template["projectandname"] = json_template["projectandname"].format(question=question)
+  json_template["FilePath"] = json_template["FilePath"].format(question=question)
+  json_template["name"] = json_template["name"].format(question=question)
+  json_template["_created"] = get_current_time()
 
-# 1. 저장한 파일을 읽어옴
-json_data = read_json(file_path)
+  # 결과 확인
+  final_json_str = json.dumps(json_template, ensure_ascii=False, indent=2)
+  # print(final_json_str)
 
-# 2. Xaml의 값을 가져옴
-xmlVal = json_data.get("Xaml", "")
+  # 필요하다면 파일로 저장
+  output_directory = "/content/blueAI_createdJson"
+  os.makedirs(output_directory, exist_ok=True)
+  file_path = os.path.join(output_directory, f"{question}.json")
 
-# 3. XML 데이터를 HTML 엔티티로 변환
-converted_xml_data = convert_xml_to_html_entities(xmlVal)
+  with open(file_path, 'w', encoding='utf-8') as json_file:
+      json_file.write(final_json_str)
+  print(f"JSON 파일이 {file_path}에 저장되었습니다.")
 
-# 4. 변환된 데이터를 다시 Xaml에 저장
-json_data["Xaml"] = converted_xml_data
+# XML 데이터를 HTML 엔티티로 변환 후 출력
+# converted_xml_data = convert_xml_to_html_entities(xmlresult)
+# print(converted_xml_data)
 
-# 5. 변경된 데이터를 다시 JSON 파일로 저장
-save_json(file_path, json_data)
 
+
+  # 파일 경로 설정 (여기서는 예시로 '/content/blueAI_createdJson/네이버에서 사과를 검색해줘.json'로 가정)
+  # 파일 경로 설정 (D 드라이브의 content 폴더 내에 위치)
+  output_directory = "D:/content/blueAI_createdJson/"+question+".json"
+  # file_path = os.path.join(output_directory, question)
+  file_path = "D:/content/blueAI_createdJson/"+question+".json"
+
+  # 1. 저장한 파일을 읽어옴
+  json_data = read_json(file_path)
+
+  # 2. Xaml의 값을 가져옴
+  xmlVal = json_data.get("Xaml", "")
+
+  # 3. XML 데이터를 HTML 엔티티로 변환
+  converted_xml_data = convert_xml_to_html_entities(xmlVal)
+
+  # 4. 변환된 데이터를 다시 Xaml에 저장
+  json_data["Xaml"] = converted_xml_data
+
+  # 5. 변경된 데이터를 다시 JSON 파일로 저장
+  save_json(file_path, json_data)
+
+
+# Define the Gradio interface
+def get_important_facts(query):
+    
+    xmlresult = rag_chain(query)
+    print("*********")
+    # print(xmlresult)
+    final_output_xaml = xaml_template.format(custom_code=xmlresult)
+    set_json_template(query, final_output_xaml)
+    return xmlresult
