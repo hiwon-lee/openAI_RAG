@@ -50,700 +50,48 @@ from langchain.chat_models import ChatOpenAI  # ChatOpenAI를 사용할 경우
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone, timedelta
 
+# 베이스 디렉토리 설정
+BASE_DIR = "bebot_templates\\"
+DATA_PATH = "ragData"
+
+api_key = os.environ.get("OPEN_API_KEY")
+client = OpenAI(api_key=api_key)
+
+# JSON 파일 읽기
+def read_json_file(filename):
+    file_path = BASE_DIR + filename
+    with open(file_path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+    return data
+
+# XML 파일 읽기
+def read_xml_file(filename):
+    file_path = BASE_DIR + filename
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+    return root
+
+# TXT 파일 읽기
+def read_txt_file(filename):
+    file_path = BASE_DIR + filename
+    with open(file_path, 'r', encoding='utf-8') as file:
+        data = file.read()
+    return data
+  
 """### json템플릿과 prompt"""
-# xaml_template, json_template, prompt는 각각 다른 파일로 만들어 모듈화하기를 추천드립니다.(죄송합니다. 시간이 없어요ㅠㅠ) - 이희원 왈 
-
-xaml_template = """<Activity mc1:Ignorable="sads sap sap2010" x:Class="openurl_uipath.xaml"
-  sap2010:WorkflowViewState.IdRef="새_워크플로우_1"
-  mva1:VisualBasic.Settings="Assembly references and imported namespaces serialized as XML namespaces"
-  xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
-  xmlns:b="clr-namespace:beBOT;assembly=beBOT"
-  xmlns:b1="clr-namespace:beBOT;assembly=beBOT.Interfaces"
-  xmlns:ba="clr-namespace:beBOT.Activities;assembly=beBOT"
-  xmlns:bi="clr-namespace:beBOT.Image;assembly=beBOT.Image"
-  xmlns:bd="clr-namespace:beBOT.Database;assembly=beBOT.Database"
-  xmlns:bi1="clr-namespace:beBOT.Interfaces;assembly=beBOT.Interfaces"
-  xmlns:bi2="clr-namespace:beBOT.Interfaces;assembly=beBOT.Interfaces"
-  xmlns:bia="clr-namespace:beBOT.Interfaces.Activities;assembly=beBOT.Interfaces"
-  xmlns:bie="clr-namespace:beBOT.Interfaces.entity;assembly=beBOT.Interfaces"
-  xmlns:bii="clr-namespace:beBOT.Interfaces.IPCService;assembly=beBOT.Interfaces"
-  xmlns:bii1="clr-namespace:beBOT.Interfaces.Input;assembly=beBOT.Interfaces"
-  xmlns:bii2="clr-namespace:beBOT.Interfaces.Image;assembly=beBOT.Interfaces"
-  xmlns:bim="clr-namespace:beBOT.Interfaces.mq;assembly=beBOT.Interfaces"
-  xmlns:bio="clr-namespace:beBOT.Interfaces.Overlay;assembly=beBOT.Interfaces"
-  xmlns:bir="clr-namespace:beBOT.Interfaces.Resources;assembly=beBOT.Interfaces"
-  xmlns:bis="clr-namespace:beBOT.Interfaces.Selector;assembly=beBOT.Interfaces"
-  xmlns:biv="clr-namespace:beBOT.Interfaces.VT;assembly=beBOT.Interfaces"
-  xmlns:biv1="clr-namespace:beBOT.Interfaces.Views;assembly=beBOT.Interfaces"
-  xmlns:biw="clr-namespace:beBOT.Interfaces.win32;assembly=beBOT.Interfaces"
-  xmlns:bn="clr-namespace:beBOT.NM;assembly=beBOT.NM"
-  xmlns:bna="clr-namespace:beBOT.NM.Activities;assembly=beBOT.NM"
-  xmlns:bnp="clr-namespace:beBOT.NM.pipe;assembly=beBOT.NM"
-  xmlns:bnr="clr-namespace:beBOT.NM.Resources;assembly=beBOT.NM"
-  xmlns:bns="clr-namespace:beBOT.NM.Snippets;assembly=beBOT.NM"
-  xmlns:bnv="clr-namespace:beBOT.NM.Views;assembly=beBOT.NM"
-  xmlns:br="clr-namespace:beBOT.Resources;assembly=beBOT"
-  xmlns:bs="clr-namespace:beBOT.Store;assembly=beBOT"
-  xmlns:bv="clr-namespace:beBOT.Views;assembly=beBOT"
-  xmlns:bv1="clr-namespace:beBOT.ViewModel;assembly=beBOT"
-  xmlns:bw="clr-namespace:beBOT.WorkItems;assembly=beBOT"
-  xmlns:boa="clr-namespace:beBOT.Office.Activities;assembly=beBOT.Office"
-  xmlns:bu="clr-namespace:beBOT.Utilities;assembly=beBOT.Utilities"
-  xmlns:bm="clr-namespace:beBOT.Mail;assembly=beBOT.Mail"
-  xmlns:bi3="clr-namespace:beBOT.Image;assembly=beBOT.Image"
-  xmlns:c="clr-namespace:Costura;assembly=OpenRPA.NM"
-  xmlns:m="clr-namespace:ManagedSSPI;assembly=System.Net.WebSockets.Client.Managed"
-  xmlns:mc="clr-namespace:Microsoft.CSharp;assembly=System"
-  xmlns:mc1="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:mss="clr-namespace:Microsoft.SqlServer.Server;assembly=System.Data"
-  xmlns:mv="clr-namespace:Microsoft.VisualBasic;assembly=System"
-  xmlns:mv1="clr-namespace:Microsoft.VisualBasic;assembly=Microsoft.VisualBasic"
-  xmlns:mva="clr-namespace:Microsoft.VisualBasic.ApplicationServices;assembly=Microsoft.VisualBasic"
-  xmlns:mva1="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
-  xmlns:mvc="clr-namespace:Microsoft.VisualBasic.CompilerServices;assembly=Microsoft.VisualBasic"
-  xmlns:mvd="clr-namespace:Microsoft.VisualBasic.Devices;assembly=Microsoft.VisualBasic"
-  xmlns:mvf="clr-namespace:Microsoft.VisualBasic.FileIO;assembly=Microsoft.VisualBasic"
-  xmlns:mvl="clr-namespace:Microsoft.VisualBasic.Logging;assembly=Microsoft.VisualBasic"
-  xmlns:mvm="clr-namespace:Microsoft.VisualBasic.MyServices;assembly=Microsoft.VisualBasic"
-  xmlns:mvmi="clr-namespace:Microsoft.VisualBasic.MyServices.Internal;assembly=Microsoft.VisualBasic"
-  xmlns:mw="clr-namespace:Microsoft.Win32;assembly=mscorlib"
-  xmlns:mw1="clr-namespace:Microsoft.Win32;assembly=System"
-  xmlns:mws="clr-namespace:Microsoft.Win32.SafeHandles;assembly=mscorlib"
-  xmlns:mws1="clr-namespace:Microsoft.Win32.SafeHandles;assembly=System.Core"
-  xmlns:mws2="clr-namespace:Microsoft.Win32.SafeHandles;assembly=System"
-  xmlns:o="clr-namespace:OpenRPA;assembly=OpenRPA"
-  xmlns:o1="clr-namespace:OpenRPA;assembly=OpenRPA.Interfaces"
-  xmlns:ou="clr-namespace:OpenRPA.Utilities;assembly=OpenRPA.Utilities"
-  xmlns:oa="clr-namespace:OpenRPA.Activities;assembly=OpenRPA"
-  xmlns:oi="clr-namespace:OpenRPA.Image;assembly=OpenRPA.Image"
-  xmlns:oi1="clr-namespace:OpenRPA.Interfaces;assembly=OpenRPA.Interfaces"
-  xmlns:oi2="clr-namespace:OpenRPA.IE;assembly=OpenRPA.IE"
-  xmlns:oia="clr-namespace:OpenRPA.Interfaces.Activities;assembly=OpenRPA.Interfaces"
-  xmlns:oie="clr-namespace:OpenRPA.Interfaces.entity;assembly=OpenRPA.Interfaces"
-  xmlns:oii="clr-namespace:OpenRPA.Interfaces.IPCService;assembly=OpenRPA.Interfaces"
-  xmlns:oii1="clr-namespace:OpenRPA.Interfaces.Input;assembly=OpenRPA.Interfaces"
-  xmlns:oii2="clr-namespace:OpenRPA.Interfaces.Image;assembly=OpenRPA.Interfaces"
-  xmlns:oim="clr-namespace:OpenRPA.Interfaces.mq;assembly=OpenRPA.Interfaces"
-  xmlns:oio="clr-namespace:OpenRPA.Interfaces.Overlay;assembly=OpenRPA.Interfaces"
-  xmlns:oir="clr-namespace:OpenRPA.Interfaces.Resources;assembly=OpenRPA.Interfaces"
-  xmlns:ois="clr-namespace:OpenRPA.Interfaces.Selector;assembly=OpenRPA.Interfaces"
-  xmlns:oiv="clr-namespace:OpenRPA.Interfaces.Views;assembly=OpenRPA.Interfaces"
-  xmlns:oiw="clr-namespace:OpenRPA.Interfaces.win32;assembly=OpenRPA.Interfaces"
-  xmlns:on="clr-namespace:OpenRPA.NM;assembly=OpenRPA.NM"
-  xmlns:ona="clr-namespace:OpenRPA.NM.Activities;assembly=OpenRPA.NM"
-  xmlns:onp="clr-namespace:OpenRPA.NM.pipe;assembly=OpenRPA.NM"
-  xmlns:onr="clr-namespace:OpenRPA.NM.Resources;assembly=OpenRPA.NM"
-  xmlns:ons="clr-namespace:OpenRPA.NM.Snippets;assembly=OpenRPA.NM"
-  xmlns:onv="clr-namespace:OpenRPA.NM.Views;assembly=OpenRPA.NM"
-  xmlns:oo="clr-namespace:OpenRPA.OpenFlowDB;assembly=OpenRPA.OpenFlowDB"
-  xmlns:ooa="clr-namespace:OpenRPA.Office.Activities;assembly=OpenRPA.Office"
-  xmlns:or="clr-namespace:OpenRPA.Resources;assembly=OpenRPA"
-  xmlns:os="clr-namespace:OpenRPA.Store;assembly=OpenRPA"
-  xmlns:ov="clr-namespace:OpenRPA.Views;assembly=OpenRPA"
-  xmlns:ov1="clr-namespace:OpenRPA.ViewModel;assembly=OpenRPA"
-  xmlns:ow="clr-namespace:OpenRPA.WorkItems;assembly=OpenRPA"
-  xmlns:p="clr-namespace:XamlGeneratedNamespace;assembly=OpenRPA"
-  xmlns:s="clr-namespace:System;assembly=mscorlib"
-  xmlns:s1="clr-namespace:System;assembly=System.Core"
-  xmlns:s2="clr-namespace:System;assembly=System"
-  xmlns:s3="clr-namespace:System;assembly=System.Memory"
-  xmlns:s4="clr-namespace:System;assembly=Microsoft.Bcl.AsyncInterfaces"
-  xmlns:s5="clr-namespace:System;assembly=Microsoft.Bcl.HashCode"
-  xmlns:s6="clr-namespace:System;assembly=System.ValueTuple"
-  xmlns:s7="clr-namespace:System;assembly=System.ServiceModel"
-  xmlns:s8="clr-namespace:System;assembly=System.ComponentModel.Composition"
-  xmlns:s9="clr-namespace:System;assembly=System.Net.WebSockets.Client.Managed"
-  xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
-  xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
-  xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
-  xmlns:sb="clr-namespace:System.Buffers;assembly=System.Memory"
-  xmlns:sbb="clr-namespace:System.Buffers.Binary;assembly=System.Memory"
-  xmlns:sbt="clr-namespace:System.Buffers.Text;assembly=System.Memory"
-  xmlns:sc="clr-namespace:System.Collections;assembly=mscorlib"
-  xmlns:sc1="clr-namespace:System.Configuration;assembly=System"
-  xmlns:sc2="clr-namespace:System.ComponentModel;assembly=System"
-  xmlns:sc3="clr-namespace:System.CodeDom;assembly=System"
-  xmlns:sca="clr-namespace:System.Configuration.Assemblies;assembly=mscorlib"
-  xmlns:scc="clr-namespace:System.Collections.Concurrent;assembly=mscorlib"
-  xmlns:scc1="clr-namespace:System.Collections.Concurrent;assembly=System"
-  xmlns:scc2="clr-namespace:System.CodeDom.Compiler;assembly=System"
-  xmlns:scc3="clr-namespace:System.ComponentModel.Composition;assembly=System.ComponentModel.Composition"
-  xmlns:scch="clr-namespace:System.ComponentModel.Composition.Hosting;assembly=System.ComponentModel.Composition"
-  xmlns:sccp="clr-namespace:System.ComponentModel.Composition.Primitives;assembly=System.ComponentModel.Composition"
-  xmlns:sccr="clr-namespace:System.ComponentModel.Composition.ReflectionModel;assembly=System.ComponentModel.Composition"
-  xmlns:scd="clr-namespace:System.ComponentModel.Design;assembly=System"
-  xmlns:scds="clr-namespace:System.ComponentModel.Design.Serialization;assembly=System"
-  xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
-  xmlns:scg1="clr-namespace:System.Collections.Generic;assembly=System.Core"
-  xmlns:scg2="clr-namespace:System.Collections.Generic;assembly=System"
-  xmlns:scg3="clr-namespace:System.Collections.Generic;assembly=Microsoft.Bcl.AsyncInterfaces"
-  xmlns:scg4="clr-namespace:System.Collections.Generic;assembly=System.ServiceModel"
-  xmlns:sci="clr-namespace:System.Collections.Immutable;assembly=System.Collections.Immutable"
-  xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
-  xmlns:sco1="clr-namespace:System.Collections.ObjectModel;assembly=System"
-  xmlns:scs="clr-namespace:System.Collections.Specialized;assembly=System"
-  xmlns:sd="clr-namespace:System.Data;assembly=System.Data"
-  xmlns:sd1="clr-namespace:System.Dynamic;assembly=System.Core"
-  xmlns:sd2="clr-namespace:System.Diagnostics;assembly=System.Core"
-  xmlns:sd3="clr-namespace:System.Diagnostics;assembly=System"
-  xmlns:sd4="clr-namespace:System.Data;assembly=System.Data"
-  xmlns:sdc="clr-namespace:System.Diagnostics.Contracts;assembly=mscorlib"
-  xmlns:sdc1="clr-namespace:System.Diagnostics.CodeAnalysis;assembly=mscorlib"
-  xmlns:sdc2="clr-namespace:System.Diagnostics.CodeAnalysis;assembly=System"
-  xmlns:sdc3="clr-namespace:System.Data.Common;assembly=System.Data"
-  xmlns:sdci="clr-namespace:System.Diagnostics.Contracts.Internal;assembly=mscorlib"
-  xmlns:sde="clr-namespace:System.Diagnostics.Eventing;assembly=System.Core"
-  xmlns:sder="clr-namespace:System.Diagnostics.Eventing.Reader;assembly=System.Core"
-  xmlns:sdi="clr-namespace:System.Deployment.Internal;assembly=mscorlib"
-  xmlns:sdo="clr-namespace:System.Data.OleDb;assembly=System.Data"
-  xmlns:sdo1="clr-namespace:System.Data.Odbc;assembly=System.Data"
-  xmlns:sdp="clr-namespace:System.Diagnostics.PerformanceData;assembly=System.Core"
-  xmlns:sds="clr-namespace:System.Diagnostics.SymbolStore;assembly=mscorlib"
-  xmlns:sds1="clr-namespace:System.Data.Sql;assembly=System.Data"
-  xmlns:sds2="clr-namespace:System.Data.SqlTypes;assembly=System.Data"
-  xmlns:sds3="clr-namespace:System.Data.SqlClient;assembly=System.Data"
-  xmlns:sdt="clr-namespace:System.Diagnostics.Tracing;assembly=mscorlib"
-  xmlns:sg="clr-namespace:System.Globalization;assembly=mscorlib"
-  xmlns:si="clr-namespace:System.IO;assembly=mscorlib"
-  xmlns:si1="clr-namespace:System.IO;assembly=System.Core"
-  xmlns:si2="clr-namespace:System.IO;assembly=System"
-  xmlns:si3="clr-namespace:System.IO;assembly=System.ServiceModel"
-  xmlns:sic="clr-namespace:System.IO.Compression;assembly=System"
-  xmlns:sii="clr-namespace:System.IO.IsolatedStorage;assembly=mscorlib"
-  xmlns:sim="clr-namespace:System.IO.MemoryMappedFiles;assembly=System.Core"
-  xmlns:sip="clr-namespace:System.IO.Pipes;assembly=System.Core"
-  xmlns:sip1="clr-namespace:System.IO.Ports;assembly=System"
-  xmlns:sl="clr-namespace:System.Linq;assembly=System.Core"
-  xmlns:sl1="clr-namespace:System.Linq;assembly=System.Collections.Immutable"
-  xmlns:sle="clr-namespace:System.Linq.Expressions;assembly=System.Core"
-  xmlns:sm="clr-namespace:System.Media;assembly=System"
-  xmlns:smi="clr-namespace:System.Management.Instrumentation;assembly=System.Core"
-  xmlns:sn="clr-namespace:System.Net;assembly=System"
-  xmlns:snc="clr-namespace:System.Net.Cache;assembly=System"
-  xmlns:snc1="clr-namespace:System.Net.Configuration;assembly=System"
-  xmlns:snm="clr-namespace:System.Net.Mail;assembly=System"
-  xmlns:snm1="clr-namespace:System.Net.Mail;assembly=System"
-  xmlns:snn="clr-namespace:System.Net.NetworkInformation;assembly=System"
-  xmlns:sns="clr-namespace:System.Net.Security;assembly=System"
-  xmlns:sns1="clr-namespace:System.Net.Sockets;assembly=System"
-  xmlns:snw="clr-namespace:System.Net.WebSockets;assembly=System"
-  xmlns:snw1="clr-namespace:System.Net.WebSockets;assembly=System.Net.WebSockets.Client.Managed"
-  xmlns:snwm="clr-namespace:System.Net.WebSockets.Managed;assembly=System.Net.WebSockets.Client.Managed"
-  xmlns:sr="clr-namespace:System.Resources;assembly=mscorlib"
-  xmlns:sr1="clr-namespace:System.Reflection;assembly=mscorlib"
-  xmlns:sr2="clr-namespace:System.Runtime;assembly=mscorlib"
-  xmlns:sr3="clr-namespace:System.Reflection;assembly=System"
-  xmlns:src="clr-namespace:System.Runtime.ConstrainedExecution;assembly=mscorlib"
-  xmlns:src1="clr-namespace:System.Runtime.CompilerServices;assembly=mscorlib"
-  xmlns:src2="clr-namespace:System.Runtime.CompilerServices;assembly=System.Core"
-  xmlns:src3="clr-namespace:System.Runtime.CompilerServices;assembly=Microsoft.Bcl.AsyncInterfaces"
-  xmlns:src4="clr-namespace:System.Runtime.CompilerServices;assembly=System.ValueTuple"
-  xmlns:srd="clr-namespace:System.Runtime.DesignerServices;assembly=mscorlib"
-  xmlns:sre="clr-namespace:System.Reflection.Emit;assembly=mscorlib"
-  xmlns:sre1="clr-namespace:System.Runtime.ExceptionServices;assembly=mscorlib"
-  xmlns:srh="clr-namespace:System.Runtime.Hosting;assembly=mscorlib"
-  xmlns:sri="clr-namespace:System.Runtime.InteropServices;assembly=mscorlib"
-  xmlns:sri1="clr-namespace:System.Runtime.InteropServices;assembly=System.Core"
-  xmlns:sri2="clr-namespace:System.Runtime.InteropServices;assembly=System"
-  xmlns:sri3="clr-namespace:System.Runtime.InteropServices;assembly=System.Memory"
-  xmlns:sric="clr-namespace:System.Runtime.InteropServices.ComTypes;assembly=mscorlib"
-  xmlns:sric1="clr-namespace:System.Runtime.InteropServices.ComTypes;assembly=System"
-  xmlns:srie="clr-namespace:System.Runtime.InteropServices.Expando;assembly=mscorlib"
-  xmlns:sriw="clr-namespace:System.Runtime.InteropServices.WindowsRuntime;assembly=mscorlib"
-  xmlns:srr="clr-namespace:System.Runtime.Remoting;assembly=mscorlib"
-  xmlns:srra="clr-namespace:System.Runtime.Remoting.Activation;assembly=mscorlib"
-  xmlns:srrc="clr-namespace:System.Runtime.Remoting.Contexts;assembly=mscorlib"
-  xmlns:srrc1="clr-namespace:System.Runtime.Remoting.Channels;assembly=mscorlib"
-  xmlns:srrl="clr-namespace:System.Runtime.Remoting.Lifetime;assembly=mscorlib"
-  xmlns:srrm="clr-namespace:System.Runtime.Remoting.Metadata;assembly=mscorlib"
-  xmlns:srrm1="clr-namespace:System.Runtime.Remoting.Messaging;assembly=mscorlib"
-  xmlns:srrmw="clr-namespace:System.Runtime.Remoting.Metadata.W3cXsd2001;assembly=mscorlib"
-  xmlns:srrp="clr-namespace:System.Runtime.Remoting.Proxies;assembly=mscorlib"
-  xmlns:srrs="clr-namespace:System.Runtime.Remoting.Services;assembly=mscorlib"
-  xmlns:srs="clr-namespace:System.Runtime.Serialization;assembly=mscorlib"
-  xmlns:srs1="clr-namespace:System.Runtime.Serialization;assembly=System.Runtime.Serialization"
-  xmlns:srsc="clr-namespace:System.Runtime.Serialization.Configuration;assembly=System.Runtime.Serialization"
-  xmlns:srsf="clr-namespace:System.Runtime.Serialization.Formatters;assembly=mscorlib"
-  xmlns:srsfb="clr-namespace:System.Runtime.Serialization.Formatters.Binary;assembly=mscorlib"
-  xmlns:srsj="clr-namespace:System.Runtime.Serialization.Json;assembly=System.Runtime.Serialization"
-  xmlns:srv="clr-namespace:System.Runtime.Versioning;assembly=mscorlib"
-  xmlns:srv1="clr-namespace:System.Runtime.Versioning;assembly=System"
-  xmlns:ss="clr-namespace:System.Security;assembly=mscorlib"
-  xmlns:ss1="clr-namespace:System.Security;assembly=System.Core"
-  xmlns:ss2="clr-namespace:System.Security;assembly=System"
-  xmlns:ss3="clr-namespace:System.ServiceModel;assembly=System.ServiceModel"
-  xmlns:ssa="clr-namespace:System.Security.AccessControl;assembly=mscorlib"
-  xmlns:ssa1="clr-namespace:System.Security.Authentication;assembly=System"
-  xmlns:ssa2="clr-namespace:System.Security.AccessControl;assembly=System"
-  xmlns:ssa3="clr-namespace:System.ServiceModel.Activation;assembly=System.ServiceModel"
-  xmlns:ssac="clr-namespace:System.ServiceModel.Activation.Configuration;assembly=System.ServiceModel"
-  xmlns:ssae="clr-namespace:System.Security.Authentication.ExtendedProtection;assembly=System"
-  xmlns:ssaec="clr-namespace:System.Security.Authentication.ExtendedProtection.Configuration;assembly=System"
-  xmlns:ssc="clr-namespace:System.Security.Cryptography;assembly=mscorlib"
-  xmlns:ssc1="clr-namespace:System.Security.Claims;assembly=mscorlib"
-  xmlns:ssc2="clr-namespace:System.Security.Cryptography;assembly=System.Core"
-  xmlns:ssc3="clr-namespace:System.Security.Claims;assembly=System"
-  xmlns:ssc4="clr-namespace:System.Security.Cryptography;assembly=System"
-  xmlns:ssc5="clr-namespace:System.ServiceModel.ComIntegration;assembly=System.ServiceModel"
-  xmlns:ssc6="clr-namespace:System.ServiceModel.Configuration;assembly=System.ServiceModel"
-  xmlns:ssc7="clr-namespace:System.ServiceModel.Channels;assembly=System.ServiceModel"
-  xmlns:sscx="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=mscorlib"
-  xmlns:sscx1="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=System.Core"
-  xmlns:sscx2="clr-namespace:System.Security.Cryptography.X509Certificates;assembly=System"
-  xmlns:ssd="clr-namespace:System.ServiceModel.Description;assembly=System.ServiceModel"
-  xmlns:ssd1="clr-namespace:System.ServiceModel.Dispatcher;assembly=System.ServiceModel"
-  xmlns:ssd2="clr-namespace:System.ServiceModel.Diagnostics;assembly=System.ServiceModel"
-  xmlns:ssm="clr-namespace:System.ServiceModel.MsmqIntegration;assembly=System.ServiceModel"
-  xmlns:ssp="clr-namespace:System.Security.Permissions;assembly=mscorlib"
-  xmlns:ssp1="clr-namespace:System.Security.Principal;assembly=mscorlib"
-  xmlns:ssp2="clr-namespace:System.Security.Policy;assembly=mscorlib"
-  xmlns:ssp3="clr-namespace:System.Security.Permissions;assembly=System"
-  xmlns:ssp4="clr-namespace:System.ServiceModel.PeerResolvers;assembly=System.ServiceModel"
-  xmlns:sss="clr-namespace:System.ServiceModel.Syndication;assembly=System.ServiceModel"
-  xmlns:sss1="clr-namespace:System.ServiceModel.Security;assembly=System.ServiceModel"
-  xmlns:ssst="clr-namespace:System.ServiceModel.Security.Tokens;assembly=System.ServiceModel"
-  xmlns:ssx="clr-namespace:System.ServiceModel.XamlIntegration;assembly=System.ServiceModel"
-  xmlns:st="clr-namespace:System.Threading;assembly=mscorlib"
-  xmlns:st1="clr-namespace:System.Text;assembly=mscorlib"
-  xmlns:st2="clr-namespace:System.Threading;assembly=System.Core"
-  xmlns:st3="clr-namespace:System.Timers;assembly=System"
-  xmlns:st4="clr-namespace:System.Threading;assembly=System"
-  xmlns:str="clr-namespace:System.Text.RegularExpressions;assembly=System"
-  xmlns:stt="clr-namespace:System.Threading.Tasks;assembly=mscorlib"
-  xmlns:stt1="clr-namespace:System.Threading.Tasks;assembly=System.Core"
-  xmlns:stt2="clr-namespace:System.Threading.Tasks;assembly=Microsoft.Bcl.AsyncInterfaces"
-  xmlns:stts="clr-namespace:System.Threading.Tasks.Sources;assembly=Microsoft.Bcl.AsyncInterfaces"
-  xmlns:sw="clr-namespace:System.Web;assembly=System"
-  xmlns:swi="clr-namespace:System.Windows.Input;assembly=System"
-  xmlns:swm="clr-namespace:System.Web.Mail;assembly=System.Web"
-  xmlns:sx="clr-namespace:System.Xml;assembly=System.Xml"
-  xmlns:sx1="clr-namespace:System.Xml;assembly=System.Runtime.Serialization"
-  xmlns:sx2="clr-namespace:System.Xml;assembly=System.Data"
-  xmlns:sxr="clr-namespace:System.Xml.Resolvers;assembly=System.Xml"
-  xmlns:sxs="clr-namespace:System.Xml.Serialization;assembly=System.Xml"
-  xmlns:sxs1="clr-namespace:System.Xml.Schema;assembly=System.Xml"
-  xmlns:sxsa="clr-namespace:System.Xml.Serialization.Advanced;assembly=System.Xml"
-  xmlns:sxsc="clr-namespace:System.Xml.Serialization.Configuration;assembly=System.Xml"
-  xmlns:sxx="clr-namespace:System.Xml.Xsl;assembly=System.Xml"
-  xmlns:sxx1="clr-namespace:System.Xml.XPath;assembly=System.Xml"
-  xmlns:sxx2="clr-namespace:System.Xml.XmlConfiguration;assembly=System.Xml"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <TextExpression.NamespacesForImplementation>
-    <sco:Collection x:TypeArguments=\"x:String\">
-      <x:String>System</x:String>
-      <x:String>System.Xml</x:String>
-      <x:String>beBOT</x:String>
-      <x:String>System.Data</x:String>
-      <x:String>System.Linq</x:String>
-      <x:String>Microsoft.VisualBasic</x:String>
-      <x:String>beBOT.Image</x:String>
-    </sco:Collection>
-  </TextExpression.NamespacesForImplementation>
-  <TextExpression.ReferencesForImplementation>
-    <sco:Collection x:TypeArguments=\"AssemblyReference\">
-      <AssemblyReference>mscorlib</AssemblyReference>
-      <AssemblyReference>System.Xml</AssemblyReference>
-      <AssemblyReference>beBOT</AssemblyReference>
-      <AssemblyReference>beBOT.Interfaces</AssemblyReference>
-      <AssemblyReference>System.Data</AssemblyReference>
-      <AssemblyReference>System.Core</AssemblyReference>
-      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
-      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
-      <AssemblyReference>System</AssemblyReference>
-      <AssemblyReference>System.Memory</AssemblyReference>
-      <AssemblyReference>ClosedXML</AssemblyReference>
-      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
-      <AssemblyReference>Microsoft.Bcl.HashCode</AssemblyReference>
-      <AssemblyReference>System.ServiceModel</AssemblyReference>
-      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
-      <AssemblyReference>System.Net.WebSockets.Client.Managed</AssemblyReference>
-      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
-      <AssemblyReference>beBOT.Image</AssemblyReference>
-      <AssemblyReference>System.Activities</AssemblyReference>
-    </sco:Collection>
-  </TextExpression.ReferencesForImplementation>
-  {custom_code}
-</Activity>
-"""
-
-json_template = {
-  "queue": None,
-  "Xaml": "",
-  "culture": "ko-KR",
-  "Serializable": "true",
-  "background": "false",
-  "Filename": "{question}.json",
-  "projectandname": "blueAI/{question}.json",
-  "FilePath": "C:\\Users\\USER\\Documents\\beBOT\\blueAI\\{question}.json",
-  "projectid": "53e36696 - 31d2 - 4baf - 9bba - 873bb4dff2fd",
-  "name": "{question}.json",
-  "_id": "9b24bc9d - 6da6 - 47c8 - 9095 - 4c853a0ad714",
-  "_type": "workflow",
-  "_modifiedby": None,
-  "_modifiedbyid": None,
-  "_created": "{created_time}",
-  "_createdby": None,
-  "_createdbyid": None,
-  "_acl": None,
-  "_encrypt": None,
-  "_version": 3
-}
-
-# llm 프롬프트
-prompt =   r"""당신은 blueAI의 xaml 제작기 이며, 만든 xaml은 uipath와 같은 환경에서 rpa를 동작하는데에 활용될 것입니다.
-그러나 지금 xaml이 활용될 곳은 bebot이라는 rpa서비스 이므로, xaml의 형식은 uipath와 달라야합니다.
-형식은 당신 마음대로 제작할 수 없습니다.
-vectordb에서 context가 당신에게 주어질 것이고, 당신은 그 형식에 맞춰 xaml을 제작해야합니다. 절대 임의로 제작해서는 안됩니다.
-xaml은 가장 효율적인 방식으로 제작되어야 합니다.
-다음 몇가지 예시를 보여드리겠습니다.
-
-user :'네이버를 열어줘'
-system :
-<Sequence>
-  <bn:OpenURL NewTab= "{{x:Null}}" UserDataFolderMode= "{{x:Null}}" UserDataFolderPath= "{{x:Null}}" Browser= "chrome" DisplayName= "네이버 접속" sap2010:WorkflowViewState.IdRef= "OpenURL_1" Url= "https://www.naver.com/" refresh= "False" />
-</Sequence>
-
-user : "네이버에서 사과를 검색해줘" ||네이버에서 사과 찾아줘
-system :
-<Sequence sap2010:WorkflowViewState.IdRef=\"Sequence_3\">\r\n
-<Sequence sap2010:WorkflowViewState.IdRef=\"Sequence_4\">\r\n
-<bn:OpenURL NewTab=\"{{x:Null}}\" UserDataFolderMode=\"{{x:Null}}\" UserDataFolderPath=\"{{x:Null}}\"
-Browser=\"chrome\" sap2010:WorkflowViewState.IdRef=\"OpenURL_2\" Url=\"https://www.naver.com\"
-refresh=\"False\" />\r\n
-</Sequence> \r\n
-<Delay Duration=\"00:00:03\" sap2010:WorkflowViewState.IdRef=\"Delay_1\" />\r\n
-<bn:GetElement Elements=\"{{x:Null}}\" From=\"{{x:Null}}\" Image=\"{{x:Null}}\" LoopAction=\"
-{{x:Null}}\" Timeout=\"{{x:Null}}\" WaitForReady=\"{{x:Null}}\" sap2010:WorkflowViewState.IdRef=\"GetElement_6\"
-MaxResults=\"1\" MinResults=\"1\" Selector=\"%[&#xD;&#xA; {{&#xD;&#xA; &quot;Selector&quot;:
-&quot;NM&quot;,&#xD;&#xA; &quot;browser&quot;: &quot;chrome&quot;,&#xD;&#xA; &quot;frame&quot;:
-&quot;-1&quot;,&#xD;&#xA; &quot;url&quot;: &quot;chrome://newtab/&quot;&#xD;&#xA; }},&#xD;&#xA;
-{{&#xD;&#xA; &quot;xpath&quot;:
-&quot;//div[@id=\\&quot;shortcutArea\\&quot;]/ul/li[5]/a/span[1]&quot;,&#xD;&#xA;
-&quot;cssselector&quot;: &quot;html &gt; body &gt; div:nth-child(3) &gt; div:nth-child(1) &gt; div &gt;
-div.shortcut_area.type_recommend.type_ad &gt; ul &gt; li:nth-child(5) &gt; a &gt;
-span.service_icon.type_news&quot;,&#xD;&#xA; &quot;tagname&quot;: &quot;SPAN&quot;,&#xD;&#xA;
-&quot;classname&quot;: &quot;service_icon type_news&quot;&#xD;&#xA; }}&#xD;&#xA;]\">\r\n
-< GetElement.Variables>\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Index\" />\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Total\" />\r\n
-bn:
-</ GetElement.Variables> \r\n
-<ActivityAction x:TypeArguments=\"bn:NMElement\">\r\n
-<ActivityAction.Argument>\r\n
-<DelegateInArgument x:TypeArguments=\"bn:NMElement\" Name=\"item\" />\r\n
-bn:
-</ActivityAction.Argument> \r\n
-<ba:ClickElement KeyModifiers=\"{{x:Null}}\" AnimateMouse=\"False\" Button=\"1\"
-DoubleClick=\"False\" Element=\"[item]\" Focus=\"False\" sap2010:WorkflowViewState.IdRef=\"ClickElement_2\"
-OffsetX=\"5\" OffsetY=\"5\" PostWait=\"00:00:02\" VirtualClick=\"True\" />\r\n
-</ActivityAction> \r\n
-</ GetElement> \r\n
-<bn:GetElement Elements=\"{{x:Null}}\" From=\"{{x:Null}}\" Image=\"{{x:Null}}\" LoopAction=\"
-bn:
-{{x:Null}}\" Timeout=\"{{x:Null}}\" WaitForReady=\"{{x:Null}}\" sap2010:WorkflowViewState.IdRef=\"GetElement_4\"
-MaxResults=\"1\" MinResults=\"1\" Selector=\"%[&#xD;&#xA; {{&#xD;&#xA; &quot;Selector&quot;:
-&quot;NM&quot;,&#xD;&#xA; &quot;browser&quot;: &quot;chrome&quot;,&#xD;&#xA; &quot;frame&quot;:
-&quot;-1&quot;,&#xD;&#xA; &quot;url&quot;: &quot;https://news.naver.com/&quot;&#xD;&#xA; }},&#xD;&#xA;
-{{&#xD;&#xA; &quot;xpath&quot;:
-&quot;/html/body/section/header/div[1]/div/div/div[2]/div[3]/a&quot;,&#xD;&#xA; &quot;cssselector&quot;:
-&quot;html &gt; body &gt; section &gt; header &gt; div.Ngnb &gt; div &gt; div &gt; div.Ngnb_right &gt;
-div.Ngnb_tool &gt; a&quot;,&#xD;&#xA; &quot;tagname&quot;: &quot;A&quot;,&#xD;&#xA;
-&quot;classname&quot;: &quot;Ntool_button _search_content_toggle_btn&quot;,&#xD;&#xA; &quot;Text&quot;:
-&quot;검색&quot;,&#xD;&#xA; &quot;href&quot;: &quot;javascript:;&quot;&#xD;&#xA; }}&#xD;&#xA;]\">\r\n
-< GetElement.Variables>\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Index\" />\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Total\" />\r\n
-bn:
-</ GetElement.Variables> \r\n
-<ActivityAction x:TypeArguments=\"bn:NMElement\">\r\n
-<ActivityAction.Argument>\r\n
-bn:
-<DelegateInArgument x:TypeArguments=\"bn:NMElement\" Name=\"item\" />\r\n
-</ActivityAction.Argument> \r\n
-<ba:ClickElement KeyModifiers=\"{{x:Null}}\" AnimateMouse=\"False\" Button=\"1\"
-DoubleClick=\"False\" Element=\"[item]\" Focus=\"False\" sap2010:WorkflowViewState.IdRef=\"ClickElement_1\"
-OffsetX=\"5\" OffsetY=\"5\" PostWait=\"00:00:02\" VirtualClick=\"True\" />\r\n
-</ActivityAction> \r\n
-</ GetElement> \r\n
-<bn:GetElement Elements=\"{{x:Null}}\" From=\"{{x:Null}}\" Image=\"{{x:Null}}\" LoopAction=\"
-bn:
-{{x:Null}}\" Timeout=\"{{x:Null}}\" WaitForReady=\"{{x:Null}}\" sap2010:WorkflowViewState.IdRef=\"GetElement_13\"
-MaxResults=\"1\" MinResults=\"1\" Selector=\"%[&#xD;&#xA; {{&#xD;&#xA; &quot;Selector&quot;:
-&quot;NM&quot;,&#xD;&#xA; &quot;browser&quot;: &quot;chrome&quot;,&#xD;&#xA; &quot;frame&quot;:
-&quot;-1&quot;,&#xD;&#xA; &quot;url&quot;: &quot;https://news.naver.com/&quot;&#xD;&#xA; }},&#xD;&#xA;
-{{&#xD;&#xA; &quot;xpath&quot;: &quot;//div[@id=\\&quot;u_hs\\&quot;]/div/div/input&quot;,&#xD;&#xA;
-&quot;cssselector&quot;: &quot;html &gt; body &gt; section &gt; header &gt; div.Ngnb &gt; div &gt; div &gt;
-div.Ngnb_right &gt; div.Ngnb_search._search_content &gt; form &gt; div.u_hs &gt; div &gt; div &gt;
-input&quot;,&#xD;&#xA; &quot;Name&quot;: &quot;query&quot;,&#xD;&#xA; &quot;type&quot;:
-&quot;search&quot;,&#xD;&#xA; &quot;tagname&quot;: &quot;INPUT&quot;,&#xD;&#xA; &quot;classname&quot;:
-&quot;u_it _search_input&quot;,&#xD;&#xA; &quot;title&quot;: &quot;검색어 입력&quot;&#xD;&#xA;
-}}&#xD;&#xA;]\">\r\n
-< GetElement.Variables>\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Index\" />\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Total\" />\r\n
-bn:
-</ GetElement.Variables> \r\n
-<ActivityAction x:TypeArguments=\"bn:NMElement\">\r\n
-bn:
-<ActivityAction.Argument>\r\n
-<DelegateInArgument x:TypeArguments=\"bn:NMElement\" Name=\"item\" />\r\n
-</ActivityAction.Argument> \r\n
-<Sequence sap2010:WorkflowViewState.IdRef=\"Sequence_11\">\r\n
-<Sequence sap2010:WorkflowViewState.IdRef=\"Sequence_10\">\r\n
-<bw1:GetElement ClearCache=\"{{x:Null}}\" Elements=\"{{x:Null}}\" Interactive=\"
-{{x:Null}}\" LoopAction=\"{{x:Null}}\" Timeout=\"{{x:Null}}\" DisplayName=\"공고명\" From=\"[item]\"
-sap2010:WorkflowViewState.IdRef=\"GetElement_11\" Image=\"\" MaxResults=\"1\" MinResults=\"[0]\"
-Selector=\"%[&#xD;&#xA; {{&#xD;&#xA; &quot;filename&quot;:
-&quot;%ProgramFiles%\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe&quot;,&#xD;&#xA;
-&quot;processname&quot;: &quot;chrome&quot;,&#xD;&#xA; &quot;arguments&quot;: &quot;&quot;,&#xD;&#xA;
-&quot;Selector&quot;: &quot;Windows&quot;,&#xD;&#xA; &quot;search_descendants&quot;:
-&quot;True&quot;,&#xD;&#xA; &quot;mouse_over_search&quot;: &quot;False&quot;&#xD;&#xA; }},&#xD;&#xA;
-{{&#xD;&#xA; &quot;ClassName&quot;: &quot;Chrome_WidgetWin_1&quot;,&#xD;&#xA; &quot;Name&quot;: &quot;
-네이버 뉴스 - Chrome - 히&quot;,&#xD;&#xA; &quot;ControlType&quot;: &quot;Pane&quot;,&#xD;&#xA;
-&quot;FrameworkId&quot;: &quot;Win32&quot;&#xD;&#xA; }},&#xD;&#xA; {{&#xD;&#xA; &quot;Name&quot;: &quot;
-검색어 입력&quot;,&#xD;&#xA; &quot;ControlType&quot;: &quot;Edit&quot;,&#xD;&#xA;
-&quot;FrameworkId&quot;: &quot;Chrome&quot;&#xD;&#xA; }}&#xD;&#xA;]\">\r\n
-< GetElement.Variables>\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Index\"
-bw1:
-/>\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Total\"
-/>\r\n
-</ GetElement.Variables> \r\n
-<ActivityAction x:TypeArguments=\"b1:UIElement\">\r\n
-bw1:
-<ActivityAction.Argument>\r\n
-<DelegateInArgument x:TypeArguments=\"b1:UIElement\" Name=\"item\"
-/>\r\n
-</ActivityAction.Argument> \r\n
-<Assign x:TypeArguments=\"x:String\"
-sap2010:WorkflowViewState.IdRef=\"Assign`1_1\" To=\"[item.Value]\" Value=\"사과\" />\r\n
-</ActivityAction> \r\n
-</w GetElement> \r\n
-b1:
-</Sequence> \r\n
-</Sequence> \r\n
-</ActivityAction> \r\n
-</ GetElement> \r\n
-<bn:GetElement Elements=\"{{x:Null}}\" From=\"{{x:Null}}\" Image=\"{{x:Null}}\" LoopAction=\"
-bn:
-{{x:Null}}\" Timeout=\"{{x:Null}}\" WaitForReady=\"{{x:Null}}\" sap2010:WorkflowViewState.IdRef=\"GetElement_16\"
-MaxResults=\"1\" MinResults=\"1\" Selector=\"%[&#xD;&#xA; {{&#xD;&#xA; &quot;Selector&quot;:
-&quot;NM&quot;,&#xD;&#xA; &quot;browser&quot;: &quot;chrome&quot;,&#xD;&#xA; &quot;frame&quot;:
-&quot;-1&quot;,&#xD;&#xA; &quot;url&quot;: &quot;&quot;&#xD;&#xA; }},&#xD;&#xA; {{&#xD;&#xA;
-&quot;xpath&quot;: &quot;//div[@id=\\&quot;u_hs\\&quot;]/div/div/button[2]&quot;,&#xD;&#xA;
-&quot;cssselector&quot;: &quot;html &gt; body &gt; section &gt; header &gt; div.Ngnb &gt; div &gt; div &gt;
-div.Ngnb_right &gt; div.Ngnb_search._search_content &gt; form &gt; div.u_hs &gt; div &gt; div &gt;
-button.u_hssbt.u_hssbt_ss._submit_btn&quot;,&#xD;&#xA; &quot;type&quot;: &quot;submit&quot;,&#xD;&#xA;
-&quot;tagname&quot;: &quot;BUTTON&quot;,&#xD;&#xA; &quot;classname&quot;: &quot;u_hssbt u_hssbt_ss
-_submit_btn &quot;,&#xD;&#xA; &quot;Text&quot;: &quot;뉴스검색&quot;&#xD;&#xA; }}&#xD;&#xA;]\">\r\n
-< GetElement.Variables>\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Index\" />\r\n
-<Variable x:TypeArguments=\"x:Int32\" Default=\"0\" Name=\"Total\" />\r\n
-bn:
-</ GetElement.Variables> \r\n
-<ActivityAction x:TypeArguments=\"bn:NMElement\">\r\n
-<ActivityAction.Argument>\r\n
-<DelegateInArgument x:TypeArguments=\"bn:NMElement\" Name=\"item\" />\r\n
-bn:
-</ActivityAction.Argument> \r\n
-<ba:ClickElement KeyModifiers=\"{{x:Null}}\" AnimateMouse=\"False\" Button=\"1\"
-DoubleClick=\"False\" Element=\"[item]\" Focus=\"False\" sap2010:WorkflowViewState.IdRef=\"ClickElement_9\"
-OffsetX=\"5\" OffsetY=\"5\" PostWait=\"00:00:02\" VirtualClick=\"True\" />\r\n
-</ActivityAction> \r\n
-</nGetElement> \r\n
-b:
-</Sequence> \r\n
-
-user : '국토교통부 사이트에서 주택청약 관련 PDF 파일을 다운로드하고, 이를 hiiwonii1012@gmail.com주소의 이메일로 전송해줘'
-system :
-<Sequence DisplayName="국토교통부" sap2010:WorkflowViewState.IdRef="Sequence_2">
-    <Sequence.Variables>
-      <Variable x:TypeArguments="bn:NMElement" Name="item" />
-      <Variable x:TypeArguments="x:String" Name="name" />
-      <Variable x:TypeArguments="x:String" Default="C:\Users\USER\Downloads" Name="baseurl" />
-    </Sequence.Variables>
-    <bn:OpenURL Browser="{{x:Null}}" NewTab="{{x:Null}}" UserDataFolderMode="{{x:Null}}" UserDataFolderPath="{{x:Null}}" sap2010:WorkflowViewState.IdRef="OpenURL_1" Url="https://www.molit.go.kr/portal.do" refresh="False" />
-    <bn:GetElement Elements="{{x:Null}}" From="{{x:Null}}" Image="{{x:Null}}" LoopAction="{{x:Null}}" Timeout="{{x:Null}}" WaitForReady="{{x:Null}}" sap2010:WorkflowViewState.IdRef="GetElement_2" MaxResults="1" MinResults="1" Selector="%[
-  {{
-    "Selector": "NM",
-    "browser": "chrome",
-    "frame": "-1",
-    "url": ""
-  }},
-  {{
-    "xpath": "//nav[@id=\&quot;gnb\&quot;]/ul/li[3]/a/i",
-    "cssselector": "html > body > div.main > header > div > div.wrap-header-cont > div > div.wrap-gnb > div > nav > ul > li:nth-child(3) > a > i",
-    "tagname": "I",
-    "Text": "정책자료"
-  }}]">
-      <bn:GetElement.Variables>
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Index" />
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Total" />
-      </bn:GetElement.Variables>
-      <ActivityAction x:TypeArguments="bn:NMElement">
-        <ActivityAction.Argument>
-          <DelegateInArgument x:TypeArguments="bn:NMElement" Name="item" />
-        </ActivityAction.Argument>
-        <ba:ClickElement KeyModifiers="{{x:Null}}" AnimateMouse="False" Button="1" DoubleClick="False" Element="[item]" Focus="False" sap2010:WorkflowViewState.IdRef="ClickElement_2" OffsetX="5" OffsetY="5" PostWait="00:00:00" VirtualClick="True" />
-      </ActivityAction>
-    </bn:GetElement>
-    <bn:GetElement Elements="{{x:Null}}" From="{{x:Null}}" Image="{{x:Null}}" LoopAction="{{x:Null}}" Timeout="{{x:Null}}" WaitForReady="{{x:Null}}" sap2010:WorkflowViewState.IdRef="GetElement_3" MaxResults="1" MinResults="1" Selector="%[
-  {{
-    "Selector": "NM",
-    "browser": "chrome",
-    "frame": "-1",
-    "url": ""
-  }},
-  {{
-    "xpath": "//input[@id=\&quot;search\&quot;]",
-    "cssselector": "html > body > div.wrap > section > div.wrap-content > article > form > div:nth-child(3) > fieldset > div.sear_word > div.sear_word_txt > input",
-    "id": "search",
-    "Name": "search",
-    "type": "text",
-    "tagname": "INPUT",
-    "title": "주제어입력"
-  }}]">
-      <bn:GetElement.Variables>
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Index" />
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Total" />
-      </bn:GetElement.Variables>
-      <ActivityAction x:TypeArguments="bn:NMElement">
-        <ActivityAction.Argument>
-          <DelegateInArgument x:TypeArguments="bn:NMElement" Name="item" />
-        </ActivityAction.Argument>
-        <Assign sap2010:WorkflowViewState.IdRef="Assign_2">
-          <Assign.To>
-            <OutArgument x:TypeArguments="x:String">[item.Value]</OutArgument>
-          </Assign.To>
-          <Assign.Value>
-            <InArgument x:TypeArguments="x:String">주택청약</InArgument>
-          </Assign.Value>
-        </Assign>
-      </ActivityAction>
-    </bn:GetElement>
-    <bn:GetElement Elements="{{x:Null}}" From="{{x:Null}}" Image="{{x:Null}}" LoopAction="{{x:Null}}" Timeout="{{x:Null}}" WaitForReady="{{x:Null}}" sap2010:WorkflowViewState.IdRef="GetElement_4" MaxResults="1" MinResults="1" Selector="%[
-  {{
-    "Selector": "NM",
-    "browser": "chrome",
-    "frame": "-1",
-    "url": ""
-  }},
-  {{
-    "xpath": "//article[@id=\&quot;cont-body\&quot;]/form/div[1]/fieldset/div[3]/div[2]/button/i",
-    "cssselector": "html > body > div.wrap > section > div.wrap-content > article > form > div:nth-child(3) > fieldset > div.sear_word > div.sear_word_txt > button > i",
-    "tagname": "I",
-    "Text": "검색"
-  }}]">
-      <bn:GetElement.Variables>
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Index" />
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Total" />
-      </bn:GetElement.Variables>
-      <ActivityAction x:TypeArguments="bn:NMElement">
-        <ActivityAction.Argument>
-          <DelegateInArgument x:TypeArguments="bn:NMElement" Name="item" />
-        </ActivityAction.Argument>
-        <ba:ClickElement KeyModifiers="{{x:Null}}" AnimateMouse="False" Button="1" DoubleClick="False" Element="[item]" Focus="False" sap2010:WorkflowViewState.IdRef="ClickElement_3" OffsetX="5" OffsetY="5" PostWait="00:00:00" VirtualClick="True" />
-      </ActivityAction>
-    </bn:GetElement>
-    <Delay Duration="00:00:02" sap2010:WorkflowViewState.IdRef="Delay_1" />
-    <bn:GetElement Elements="{{x:Null}}" From="{{x:Null}}" Image="{{x:Null}}" LoopAction="{{x:Null}}" Timeout="{{x:Null}}" WaitForReady="{{x:Null}}" sap2010:WorkflowViewState.IdRef="GetElement_5" MaxResults="1" MinResults="1" Selector="%[
-  {{
-    "Selector": "NM",
-    "browser": "chrome",
-    "frame": "-1",
-    "url": ""
-  }},
-  {{
-    "xpath": "//table[@id=\&quot;board-list\&quot;]/tbody/tr/td[2]/a",
-    "cssselector": "html > body > div.wrap > section > div.wrap-content > article > table > tbody > tr > td.bd_title > a",
-    "tagname": "A",
-    "Text": "주택청약 FAQ",
-    "href": "dtl.jsp?search=주택청약&amp;srch_dept_nm=&amp;srch_dept_id=&amp;srch_usr_nm=&amp;srch_usr_titl=Y&amp;srch_usr_ctnt=&amp;search_regdate_s=&amp;search_regdate_e=&amp;psize=10&amp;s_category=&amp;p_category=&amp;lcmspage=1&amp;id=4765"
-  }}]">
-      <bn:GetElement.Variables>
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Index" />
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Total" />
-      </bn:GetElement.Variables>
-      <ActivityAction x:TypeArguments="bn:NMElement">
-        <ActivityAction.Argument>
-          <DelegateInArgument x:TypeArguments="bn:NMElement" Name="item" />
-        </ActivityAction.Argument>
-        <ba:ClickElement KeyModifiers="{{x:Null}}" AnimateMouse="False" Button="1" DoubleClick="False" Element="[item]" Focus="False" sap2010:WorkflowViewState.IdRef="ClickElement_4" OffsetX="5" OffsetY="5" PostWait="00:00:00" VirtualClick="True" />
-      </ActivityAction>
-    </bn:GetElement>
-    <Delay Duration="00:00:02" sap2010:WorkflowViewState.IdRef="Delay_2" />
-    <bn:GetElement Elements="{{x:Null}}" From="{{x:Null}}" Image="{{x:Null}}" LoopAction="{{x:Null}}" Timeout="{{x:Null}}" WaitForReady="{{x:Null}}" sap2010:WorkflowViewState.IdRef="GetElement_6" MaxResults="1" MinResults="1" Selector="%[
-  {{
-    "Selector": "NM",
-    "browser": "chrome",
-    "frame": "-1",
-    "url": "https://www.molit.go.kr/USR/policyData/m_34681/dtl.jsp?search=주택청약&amp;srch_dept_nm=&amp;srch_dept_id=&amp;srch_usr_nm=&amp;srch_usr_titl=Y&amp;srch_usr_ctnt=&amp;search_regdate_s=&amp;search_regdate_e=&amp;psize=10&amp;s_category=&amp;p_category=&amp;lcmspage=1&amp;id=4765"
-  }},
-  {{
-    "xpath": "//article[@id=\&quot;cont-body\&quot;]/div[1]/ul/li[7]/span/a",
-    "cssselector": "html > body > div.wrap > section > div.wrap-content > article > div.bd_view > ul > li.file > span > a",
-    "tagname": "A",
-    "Text": "★ 2024 주택청약 FAQ.pdf",
-    "href": "/portal/common/download/DownloadMltm2.jsp?FilePath=portal/DextUpload/202405/20240529_165121_948.pdf&amp;FileName=★ 2024 주택청약 FAQ.pdf"
-  }}]">
-      <bn:GetElement.Variables>
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Index" />
-        <Variable x:TypeArguments="x:Int32" Default="0" Name="Total" />
-      </bn:GetElement.Variables>
-      <ActivityAction x:TypeArguments="bn:NMElement">
-        <ActivityAction.Argument>
-          <DelegateInArgument x:TypeArguments="bn:NMElement" Name="item" />
-        </ActivityAction.Argument>
-        <Sequence sap2010:WorkflowViewState.IdRef="Sequence_4">
-          <ba:ClickElement KeyModifiers="{{x:Null}}" AnimateMouse="False" Button="1" DoubleClick="False" Element="[item]" Focus="False" sap2010:WorkflowViewState.IdRef="ClickElement_5" OffsetX="5" OffsetY="5" PostWait="00:00:00" VirtualClick="True" />
-          <Assign sap2010:WorkflowViewState.IdRef="Assign_3">
-            <Assign.To>
-              <OutArgument x:TypeArguments="x:String">[name]</OutArgument>
-            </Assign.To>
-            <Assign.Value>
-              <InArgument x:TypeArguments="x:String">[item.Value]</InArgument>
-            </Assign.Value>
-          </Assign>
-        </Sequence>
-      </ActivityAction>
-    </bn:GetElement>
-    <Delay Duration="00:00:03" sap2010:WorkflowViewState.IdRef="Delay_3" />
-    <bm:SendMailUsingSMTP Body="{{x:Null}}" DeliveryMessage="{{x:Null}}" HiddenReference="{{x:Null}}" Reference="{{x:Null}}" ReplyEmail="{{x:Null}}" SenderEmailDisplaied="{{x:Null}}" SenderName="{{x:Null}}" StatusCode="{{x:Null}}" Attachments="[baseurl + \"+name]" sap2010:WorkflowViewState.IdRef="SendMailUsingSMTP_1" ReceiverEmail="hiiwonii1012@gmail.com" SecureConnection="1" SenderEmail="kwakkyoleen@outlook.kr" SenderPassword="0312gk**" SmtpServer="0" SmtpServerPort="587" SmtpServerUrl="smtp.office365.com" Subject="데이터 수집 완료 되었습니다" bodyIsHtml="False" ignoreCrl="False" />
-    <sads1:DebugSymbol.Symbol>dw1DOlxFbXB0eS54YW1sAA==</sads1:DebugSymbol.Symbol>
-</Sequence>
-
-와 같이 대답해야합니다.
-xaml은 sequence 태그로 감싸져야합니다.
-
-Context:
-{context}
----
-
-user: {question}
-system:"""
-
-# drive.mount('/content/drive', force_remount=True)
+xaml_template = read_txt_file("xaml_template.txt")
+json_template = read_json_file("json_template.json")
+prompt = read_txt_file("prompt.txt")
 
 load_dotenv(
     dotenv_path='.env',
     verbose=True,
 )
-api_key = os.environ.get("OPEN_API_KEY")
-client = OpenAI(api_key=api_key)
 
-# 객체 내용 출력 유틸
-def show_json(obj):
-  display(json.loads(obj.model_dump_json()))
 
-def _get_response(thread_id):
-    return client.beta.threads.messages.list(thread_id=thread_id, order="asc")
-
-# Thread message 출력 유틸
-def print_message(thread_id):
-    for res in _get_response(thread_id):
-        print(f"[{res.role.upper()}]\n{res.content[0].text.value}\n")
 
 """## File-Search Assistant 생성
 
@@ -752,10 +100,9 @@ def print_message(thread_id):
 """
 
 # 폴더 전체로 넣을 경우
-DATA_PATH = "ragData"
+
 document_loader = PyPDFDirectoryLoader(DATA_PATH)
 documents = document_loader.load()
-# print(documents)
 
 # 문서를 청크 단위로 자름
 def split_documents(documents: list[Document]):
@@ -765,10 +112,6 @@ def split_documents(documents: list[Document]):
         length_function=len,
         is_separator_regex=False,
     )
-    # text_splitter = RecursiveCharacterTextSplitter(
-    #     chunk_size = 500,
-    #     chunk_overlap = 0
-    # )
     return text_splitter.split_documents(documents)
 
 chunks = split_documents(documents)
@@ -779,11 +122,11 @@ chunks = split_documents(documents)
 # 임베딩 모델
 embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
-
 # 벡터 데이터베이스에 적재
 vector_database = Chroma.from_documents(documents = chunks, embedding = embeddings)
 
-
+# Define the RAG setup
+retriever = vector_database.as_retriever()
 # question  ="네이버에서 사과를 검색해줘"
 
 # llm모델 가져오기
@@ -791,7 +134,6 @@ llm = ChatOpenAI(api_key=api_key, model_name="gpt-4o", temperature=0)
 
 # rag chain구성 틀
 chain = load_qa_chain(llm, chain_type="stuff",verbose=True)
-
 
 # rag chain에 넣을 prompt구성
 QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt)
@@ -830,14 +172,10 @@ def gpt_llm(query):
 
   return result["result"]
 
-
 def generate_response(messages):
     # Create a loading spinner
     spinner = Halo(text='Loading...', spinner='dots')
     spinner.start()
-
-# Define the RAG setup
-retriever = vector_database.as_retriever()
 
 def rag_chain(query):
     retrieved_docs = retriever.invoke(query)
@@ -845,36 +183,21 @@ def rag_chain(query):
     # return gpt_llm(question, formatted_context)
     return gpt_llm(query)
 
-
-
-
-# Create a Gradio app interface
-# iface = gr.Interface(
-#   fn=get_important_facts,
-#   inputs=gr.Textbox(lines=2, placeholder="Enter your question here..."),
-#   outputs="text",
-#   title="blueAI",
-#   description="Ask questions about the proveded context",
-# )
-
-# Launch the Gradio app
-# iface.launch()
-
-### 실행 라인!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+################################################
+### 실행 라인!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+### 만약 flask를 활용하지 않고, command라인에서 실행하고 싶다면, 아래의 주석을 해제하고 실행해보시면 됩니다.
+### cmd 명령어 : `python blueai_langchain_rag_chroma_gpt_tojson_v7.py`
 # question = input()
 # xmlresult = get_important_facts(question)
-# xmlresult
-import html
+#
+# LLM이 반환한 결과 확인
+# print(xmlresult)
+##################################################
 
 """# 여기까지가 xaml을 출력하는 부 입니다.
 
 v7에서는 해당 xaml을 json형식에 맞게 가공하는 절차가 추가됩니다.
 """
-
-# LLM이 반환한 결과 확인
-# print(xmlresult)
-
-
 
 """# LLM이 제작한 핵심 xaml을 bebot에 들어갈 json형식으로 변환
 
@@ -885,6 +208,7 @@ v7에서는 해당 xaml을 json형식에 맞게 가공하는 절차가 추가됩
 """
 
 # 이스케이프 처리를 위한 백슬래시 추가
+# html 엔티티추가 문제를 해결하는 함수입니다.
 def convert_xml_to_html_entities(xml_str):
     # selector 문자열에서 모든 큰따옴표를 \"로 대체
     selector = xml_str.replace(r'\\', "").replace(r"`xml",'').replace(r"`",'')
@@ -925,14 +249,6 @@ def convert_xml_to_html_entities(xml_str):
     return selector
 
 
-
-
-
-
-
-
-
-
 """## 2. json 템플릿에 추가"""
 
 # JSON 데이터로 변환
@@ -941,7 +257,7 @@ def convert_xml_to_html_entities(xml_str):
 #     "queue": none,
 #     "Xml": converted_xml_data
 # }
-from datetime import datetime, timezone, timedelta
+
 
 # 현재 시간을 가져와서 ISO 8601 형식으로 변환
 def get_current_time():
@@ -1016,9 +332,9 @@ def set_json_template(question, final_output_xaml):
 
 # Define the Gradio interface
 def get_important_facts(query):
-    
+
     xmlresult = rag_chain(query)
-    print("*********")
+    # print("*********")
     # print(xmlresult)
     final_output_xaml = xaml_template.format(custom_code=xmlresult)
     set_json_template(query, final_output_xaml)
