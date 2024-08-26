@@ -1,0 +1,22 @@
+{
+  "queue": null,
+  "Xaml": "",
+  "culture": "ko-KR",
+  "Serializable": "true",
+  "background": "false",
+  "Filename": "{question}.json",
+  "projectandname": "blueAI/{question}.json",
+  "FilePath": "C:\\Users\\USER\\Documents\\beBOT\\blueAI\\{question}.json",
+  "projectid": "53e36696 - 31d2 - 4baf - 9bba - 873bb4dff2fd",
+  "name": "{question}.json",
+  "_id": "9b24bc9d - 6da6 - 47c8 - 9095 - 4c853a0ad714",
+  "_type": "workflow",
+  "_modifiedby": null,
+  "_modifiedbyid": null,
+  "_created": "{created_time}",
+  "_createdby": null,
+  "_createdbyid": null,
+  "_acl": null,
+  "_encrypt": null,
+  "_version": 3
+}
