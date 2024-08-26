@@ -14,4 +14,9 @@ pip install -r requirements.txt
 git config --global commit.template .gitmessage.txt
 ```
 
+## 프로젝트 실행
+
+```cmd
+
+```
 ---
