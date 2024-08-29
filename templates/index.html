@@ -7,6 +7,8 @@
     <title>Render Templates Example</title>
 
     <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/root.js"></script>
+    <!-- 수정된 부분 -->
   </head>
 
   <body>
@@ -16,7 +18,7 @@
       <input type="text" id="query" name="query" required />
       <button type="submit">Submit</button>
     </form>
-
+    <div id="spinner" class="spinner"></div>
     {% if query %}
     <h2>Your Query:</h2>
     <p>{{ query }}</p>
