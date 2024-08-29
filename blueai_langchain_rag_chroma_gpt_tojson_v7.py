@@ -100,7 +100,6 @@ load_dotenv(
 """
 
 # 폴더 전체로 넣을 경우
-
 document_loader = PyPDFDirectoryLoader(DATA_PATH)
 documents = document_loader.load()
 
@@ -121,12 +120,15 @@ chunks = split_documents(documents)
 
 # 임베딩 모델
 embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+# embeddings =  SentenceTransformerEmbeddings(model_name="BAAI/bge-m3")
 
 # 벡터 데이터베이스에 적재
 vector_database = Chroma.from_documents(documents = chunks, embedding = embeddings)
 
 # Define the RAG setup
 retriever = vector_database.as_retriever()
+
+
 # question  ="네이버에서 사과를 검색해줘"
 
 # llm모델 가져오기
@@ -145,7 +147,7 @@ def gpt_llm(query):
   # Retrieval QA
   qa_chain = RetrievalQA.from_chain_type(
       llm=llm,
-      retriever=vector_database.as_retriever(),
+      retriever=retriever,
       chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
   )
 
@@ -160,7 +162,7 @@ def gpt_llm(query):
   else:
       print("No relevant context found.")
 
-  # 입력값을 "context"와 "x"로 묶어서 전달
+  # 입력값을 "context"와 "query"로 묶어서 전달
   input_data = {
       "context": context,
       "query": query
@@ -179,7 +181,7 @@ def generate_response(messages):
 
 def rag_chain(query):
     retrieved_docs = retriever.invoke(query)
-    formatted_context = "\n\n".join(doc.page_content for doc in retrieved_docs)
+    # formatted_context = "\n\n".join(doc.page_content for doc in retrieved_docs)
     # return gpt_llm(question, formatted_context)
     return gpt_llm(query)
 
@@ -332,7 +334,6 @@ def set_json_template(question, final_output_xaml):
 
 # Define the Gradio interface
 def get_important_facts(query):
-
     xmlresult = rag_chain(query)
     # print("*********")
     # print(xmlresult)
